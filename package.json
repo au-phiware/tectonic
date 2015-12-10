@@ -1,0 +1,32 @@
+{
+  "name": "pure4dom",
+  "version": "0.0.1",
+  "description": "A revival of Beebole's PURE library.",
+  "main": "pure.js",
+  "scripts": {
+    "test": "open spec/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/au-phiware/pure4dom.git"
+  },
+  "keywords": [
+    "unobtrusive",
+    "templating",
+    "templates",
+    "template",
+    "html",
+    "render"
+  ],
+  "author": "Corin Lawson <corin@phiware.com.au>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/au-phiware/pure4dom/issues"
+  },
+  "homepage": "https://github.com/au-phiware/pure4dom#readme",
+  "devDependencies": {
+    "dom-compare": "^0.2.1",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1"
+  }
+}
