@@ -14,6 +14,7 @@
 <body>
     <div class="fixtures">
         <div class="fix" it="auto renders"
+                         method="autoRender"
                          data='{"hello": "Hello, World"}'>
             <div><span class="hello">Hello</span></div>
             <div><span class="hello">Hello, World</span></div>
@@ -31,6 +32,7 @@
             <div><span>Hello, World</span></div>
         </div>
         <div class="fix" it="auto renders loop"
+                         method="autoRender"
                          data='{"friend": [{"name": "Hughes", "twitter": "hugheswaroquier"}, {"name": "Yves", "twitter": "yveshiernaux"}], "who": "dono", "who2": {"name": "Mic", "twitter": "tchvil"}}'
                          directive='{".who":"who2.name", ".who@title":"\"See the tweets of \"who2.twitter", ".who@href+": "who2.twitter"}'>
             <div>
@@ -40,10 +42,9 @@
                 </ul>
             </div>
             <div>
-                The friends of <a class="who" title="See the tweets of tchvil" href="http://twitter.com/tchvil">Mic</a> are
+                The friends of <a class="who" href="http://twitter.com/tchvil" title="See the tweets of tchvil">Mic</a> are
                 <ul>
-                    <li class="friend"><a class="name twitter twitter+" title="hugheswaroquier" href="http://twitter.com/hugheswaroquier">Hughes</a></li>
-                    <li class="friend"><a class="name twitter twitter+" title="yveshiernaux" href="http://twitter.com/yveshiernaux">Yves</a></li>
+                    <li class="friend"><a class="name twitter twitter" href="http://twitter.com/hugheswaroquier" title="hugheswaroquier">Hughes</a></li><li class="friend"><a class="name twitter twitter" href="http://twitter.com/yveshiernaux" title="yveshiernaux">Yves</a></li>
                 </ul>
             </div>
         </div>
@@ -67,9 +68,7 @@
                 </select>
             </form>
         </div>
-        <div class="fix" it="renders nested loop"
-                         data='{"teams":[{"name":"Cats","players":[{"first":"Alice","last":"Keasler","score":[16,15,99,100]},{"first":"","name":"","score":0},{"first":"Vicky","last":"Benoit","score":[3,5]},{"first":"Wayne","last":"Dartt","score":[9,10]}]},{"name":"Dogs","players":[{"first":"Ray","last":"Braun","score":14},{"first":"Aaron","last":"Ben","score":24},{"first":"Steven","last":"Smith","score":1},{"first":"Kim","last":"Caffey","score":19}]},{"name":"Birds","players":null},{"name":"Mice","players":[{"first":"Natalie","last":"Kinney","score":16},{"first":"Caren","last":"Cohen","score":3}]}]}'
-                         directive='{"tr.scoreBoard":{"team<-teams":{"td.teamName":"team.name","tr.teamList":{"player<-team.players":{"td.player":"player.first \"(\" player.last \")\"","td.score":"player.score"}}}}}'>
+        <div id="5">
             <div class="scoreBoard">
                 <table>
                     <tbody>
@@ -85,10 +84,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="teamList">
+                                        <tr class="teamList even">
                                             <td class="position">1</td>
                                             <td class="player">Chloe</td>
                                             <td class="score">3</td>
+                                        </tr><tr class="teamList odd">
+                                            <td class="position">2</td>
+                                            <td class="player">Charlie</td>
+                                            <td class="score">2</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -176,7 +179,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                        <!--tr.teamList-->
                                     </tbody>
                                 </table>
                             </td>
@@ -301,6 +304,10 @@
         <div id="4">
             <div><span></span></div>
             <div><span>2</span></div>
+        </div>
+        <div id="6">
+            <div><tt>: </tt></div>
+            <div><tt>Cats: 1</tt><tt>Dogs: 2</tt><tt>Birds: 3</tt><tt>Mice: 4</tt></div>
         </div>
     </div>
 

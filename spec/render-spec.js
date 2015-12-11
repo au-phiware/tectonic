@@ -94,6 +94,130 @@ describe("Directives", function() {
       .toEqual(expected.outerHTML);
   });
 
+  it("custom formatter in loop", function() {
+    var data = {
+      "teams": [ "Cats", "Dogs", "Birds", "Mice" ]
+    };
+    var directive = {
+      "tt": {
+        "team<-teams": {
+          "+.": "team",
+          ".+": function(element, data, i, elements) {
+            return i + 1;
+          }
+        }
+      }
+    };
+    var element = document.getElementById(6);
+    var expected = element.children[1];
+    element = element.children[0];
+    expect(new Pure(element)
+        .render(data, directive)
+        .get()
+        .outerHTML)
+      .toEqual(expected.outerHTML);
+  });
+
+  it("double nested loop", function() {
+    var data = {
+      "teams": [
+        {
+          "name": "Cats",
+          "players": [
+            {
+              "first": "Alice",
+              "last": "Keasler",
+              "score": [16,15,99,100]
+            },
+            {
+              "first": "",
+              "name": "",
+              "score": 0
+            },
+            {
+              "first": "Vicky",
+              "last": "Benoit",
+              "score": [3,5]
+            },
+            {
+              "first": "Wayne",
+              "last": "Dartt",
+              "score": [9,10]
+            }
+          ]
+        },
+        {
+          "name": "Dogs",
+          "players": [
+            {
+              "first": "Ray",
+              "last": "Braun",
+              "score": 14
+            },
+            {
+              "first": "Aaron",
+              "last": "Ben",
+              "score": 24
+            },
+            {
+              "first": "Steven",
+              "last": "Smith",
+              "score": 1
+            },
+            {
+              "first": "Kim",
+              "last": "Caffey",
+              "score": 19
+            }
+          ]
+        },
+        {
+          "name": "Birds",
+          "players": null
+        },
+        {
+          "name": "Mice",
+          "players": [
+            {
+              "first": "Natalie",
+              "last": "Kinney",
+              "score": 16
+            },
+            {
+              "first": "Caren",
+              "last": "Cohen",
+              "score": 3
+            }
+          ]
+        }
+      ]
+    };
+    var directive = {
+      "tr.scoreBoard": {
+        "team<-teams": {
+          "td.teamName": "team.name",
+          "tr.teamList": {
+            "player<-team.players": {
+              "td.player": "player.first ' (' player.last ')'",
+              "td.score": "player.score",
+              "td.position": function(element, data, i, elements) {
+                return i + 1;
+              }
+            }
+          }
+        }
+      }
+    };
+    var element = document.getElementById(5);
+    var expected = element.children[1];
+    element = element.children[0];
+    expect(new Pure(element)
+        .render(data, directive)
+        .get()
+        .outerHTML)
+      .toEqual(expected.outerHTML);
+  });
+
   it("renders recursively", function() {
     var element = document.getElementById(2);
     var expected = element.children[1];
@@ -101,69 +225,72 @@ describe("Directives", function() {
     expect(new Pure(element)
         .render({
           "children": [
-          {
-            "name": "Europe",
-            "children": [
             {
-              "name": "Belgium",
+              "name": "Europe",
               "children": [
-              {
-                "name": "Brussels",
-                "children": null
-              },
-              {
-                "name": "Namur"
-              },
-              {
-                "name": "Antwerpen"
-              }
+                {
+                  "name": "Belgium",
+                  "children": [
+                    {
+                      "name": "Brussels",
+                      "children": null
+                    },
+                    {
+                      "name": "Namur"
+                    },
+                    {
+                      "name": "Antwerpen"
+                    }
+                  ]
+                },
+                {
+                  "name": "Germany"
+                },
+                {
+                  "name": "UK"
+                }
               ]
             },
             {
-              "name": "Germany"
-            },
-            {
-              "name": "UK"
-            }
-            ]
-          },
-          {
-            "name": "America",
-            "children": [
-            {
-              "name": "US",
+              "name": "America",
               "children": [
-              {
-                "name": "Alabama"
-              },
-              {
-                "name": "Georgia"
-              }
+                {
+                  "name": "US",
+                  "children": [
+                    {
+                      "name": "Alabama"
+                    },
+                    {
+                      "name": "Georgia"
+                    }
+                  ]
+                },
+                {
+                  "name": "Canada"
+                },
+                {
+                  "name": "Argentina"
+                }
               ]
             },
             {
-              "name": "Canada"
+              "name": "Asia"
             },
             {
-              "name": "Argentina"
+              "name": "Africa"
+            },
+            {
+              "name": "Antarctica"
             }
-            ]
-          },
-          {
-            "name": "Asia"
-          },
-          {
-            "name": "Africa"
-          },
-          {
-            "name": "Antarctica"
-          }
           ]
         }, {
           "li": {
             "child <- children": {
               "a": "child.name",
-              "a@onclick": "\"alert('\"child.name\"');\""
+              "a@onclick": "\"alert('\"child.name\"');\"",
+              ".children": function() {
+                debugger;
+              }
             }
           }
         })
@@ -175,7 +302,8 @@ describe("Directives", function() {
 
 function renderIt(context, element, expected) {
   it(context.it.value, function() {
-    expect(new Pure(element).render(
+    expect(new Pure(element)
+        [context.method && context.method.value || 'render'](
           JSON.parse(context.data.value),
           context.directive && JSON.parse(context.directive.value))
         .get()
