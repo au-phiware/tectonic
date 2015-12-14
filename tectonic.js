@@ -1,4 +1,7 @@
-function Pure(element) {
+function Tectonic(element) {
+  if (!(element instanceof Node)) {
+    element = element.get(0);
+  }
   var basis = element.cloneNode(true);
 
   this.get = function() {
@@ -15,12 +18,12 @@ function Pure(element) {
 
   this.render = function(data, directive) {
     if (!directive) {
-      directive = autoCompile(data, {});
+      directive = autoCompile(data);
     }
     if (typeof directive !== 'function') {
       directive = this.compile(directive);
     }
-    var newElement = directive(data);
+    var newElement = directive.call(this, data);
     if (newElement !== element) {
       if (element.parentNode) {
         element.parentNode.replaceChild(newElement, element);
@@ -32,8 +35,9 @@ function Pure(element) {
 
   this.compile = function(directive) {
     var renderer = plugin.compile([basis], directive);
+    var tectonic = this;
     return function(data) {
-      return renderer(element, data);
+      return renderer(this === tectonic ? element : basis.cloneNode(true), data);
     }
   };
 }
@@ -43,7 +47,7 @@ function compiler(root, spec, template) {
   var write = plugin.writer(root, spec, template);
   var format = plugin.formatter(root, spec, template);
 
-  return function(targets, data, index, elements, collection) {
+  return function renderAction(targets, data, index, elements, collection) {
     for (var j = 0, jj = targets.length; j < jj; j++) {
       var target = targets[j];
       var bindData = format(target, data, index, elements, collection);
@@ -57,7 +61,7 @@ function compiler(root, spec, template) {
 
 function parseSelector(str) {
   var spec = { raw: str };
-  var match = str.match(/^([+-])? *([^\@\+]+)? *(\@([^\+]+))? *([+-])?$/);
+  var match = str.match(/^([+-])? *([^\@\+]+)? *(\@([^ ]+?))? *([+-])?$/);
 
   if (!match)
     throw "invalid selector: '" + str + "'";
@@ -112,7 +116,7 @@ var plugin = {
     var loopSpec, renderer;
     if (spec.attr) {
       return attrWriter;
-    } else if (typeof template === 'object') {
+    } else if (typeof template === 'object' && !plugin.isArray(template)) {
       loopSpec = plugin.parseLoopSpec(template);
       renderer = plugin.compile(plugin.find(root, spec.selector), template[loopSpec[0]]);
       return arrayWriter;
@@ -129,12 +133,18 @@ var plugin = {
           }
           target.setAttribute('value', value);
         } else {
+          if (!(value instanceof Node)) {
+            value = document.createTextNode(value);
+          }
           if (spec.append) {
-            target.appendChild(document.createTextNode(value));
+            target.appendChild(value);
           } else if (spec.prepend && target.childNodes.length) {
-            target.insertBefore(document.createTextNode(value), target.childNodes[0]);
+            target.insertBefore(value, target.childNodes[0]);
           } else {
-            target.innerHTML = value;
+            if (target.childNodes.length) {
+              target.innerHTML = "";
+            }
+            target.appendChild(value);
           }
         }
       } else {
@@ -152,21 +162,48 @@ var plugin = {
       renderer(target, data, i, targets, value);
     }
     function attrWriter(target, value) {
-      if (target.tagName.toUpperCase() === "OPTION" && spec.attr === "selected") {
-        var selected = value === 'false' ? false : Boolean(value);
-        target.selected = selected;
-        if (selected) {
-          target.setAttribute("selected", value);
+      if (target.nodeType === 1) {
+        if (target.tagName.toUpperCase() === "OPTION" && spec.attr === "selected") {
+          var selected = value === 'false' ? false : Boolean(value);
+          target.selected = selected;
+          if (selected) {
+            target.setAttribute("selected", value);
+          } else {
+            target.removeAttribute("selected");
+          }
+        } else if (target.tagName.toUpperCase() === "INPUT" && spec.attr === "checked") {
+          var checked = value === 'false' ? false : Boolean(value);
+          target.checked = checked;
+          if (checked) {
+            target.setAttribute("checked", value);
+          } else {
+            target.removeAttribute("checked");
+          }
+        } else if (spec.attr === "class" || spec.attr === "className" || spec.attr === "classList") {
+          if (spec.toggle) {
+            var classList = ' ' + target.getAttribute('class') + ' ';
+            if (classList.indexOf(' ' + value + ' ') >= 0) {
+              classList = classList.replace(' ' + value + ' ', ' ');
+            } else if (spec.append) {
+              classList += value;
+            } else {
+              classList = value + classList;
+            }
+            value = classList.replace(/^ +| +$/g, '');
+          } else if (spec.append) {
+            value = target.getAttribute(spec.attr) + ' ' + value;
+          } else if (spec.prepend) {
+            value = value + ' ' + target.getAttribute(spec.attr);
+          }
+          target.setAttribute('class', value);
         } else {
-          target.removeAttribute("selected");
+          if (spec.append) {
+            value = target.getAttribute(spec.attr) + value;
+          } else if (spec.prepend) {
+            value = value + target.getAttribute(spec.attr);
+          }
+          target.setAttribute(spec.attr, value);
         }
-      } else if (target.nodeType === 1) {
-        if (spec.append) {
-          value = target.getAttribute(spec.attr) + value;
-        } else if (spec.prepend) {
-          value = value + target.getAttribute(spec.attr);
-        }
-        target.setAttribute(spec.attr, value);
       } else {
         if (spec.append) {
           value = target[spec.attr] + value;
@@ -181,7 +218,7 @@ var plugin = {
   // get the new value that will be past to set.
   formatter: function(root, spec, template) {
     var pathExp = /^[\da-zA-Z\$_\@\#][\w\$:\-\#]*(\.[\w\$:\-\#]*[^\.])*$/;
-    var key, loopSpec, search, found, parts;
+    var key, looper, search, found, parts;
     switch (typeof template) {
       case 'function':
         return template;
@@ -189,9 +226,12 @@ var plugin = {
         if (plugin.isArray(template)) {
           return walkFormatter(template);
         } else {
-          return walkFormatter(plugin.parseLoopSpec(template)[3].split('.'));
+          looper = walkFormatter(plugin.parseLoopSpec(template)[3].split('.'));
+          if ('sort' in template || template.filter) {
+            looper = arrayFormatter(looper, template);
+          }
+          return looper;
         }
-        break;
       case 'string':
         parts = [];
         search = / *(?:"([^"]*)"|'([^']*)'|([^'" ]+)) */g;
@@ -206,8 +246,29 @@ var plugin = {
           return parts[0];
         } else if (parts.length > 1) {
           return concatenator(parts);
+        } else {
+          return function emptyFormatter() { return ''; };
         }
-        break;
+    }
+    function arrayFormatter(formatter, template) {
+      return function(target, data) {
+        var filtered;
+        var array = formatter.apply(this, arguments);
+        if (template.filter) {
+          filtered = [];
+          for (var i = 0, ii = array.length; i < ii; i++) {
+            if (template.filter(array[i])) {
+              filtered.push(array[i]);
+            }
+          }
+        } else {
+          filtered = Array.prototype.slice.call(array);
+        }
+        if ('sort' in template) {
+          filtered.sort(template.sort);
+        }
+        return filtered;
+      };
     }
     function walkFormatter(path) {
       return function(target, data) {
@@ -247,11 +308,12 @@ var plugin = {
     var e, up, q = [element];
     var d, head, stack = [data];
     var classNames, specs, spec, i, ii;
-    var els, j, jj;
+    var children, els, j, jj;
     while (q.length) {
       e = q.pop();
       if (e) {
         if (e.nodeType === 1) {
+          children = e.children;
           if (e.className) {
             specs = [];
             classNames = e.className.split(/ +/);
@@ -276,7 +338,8 @@ var plugin = {
                   if (e.parentNode) {
                     up = e.parentNode;
                   } else {
-                    up = document.createDocumentFragment().appendChild(e);
+                    up = document.createDocumentFragment();
+                    up.appendChild(e);
                   }
                   els = arrayFinder(spec)(up, d, [up]);
                   for (j = 0, jj = d.length; j < jj; j++) {
@@ -284,12 +347,15 @@ var plugin = {
                       stack.unshift(d[j]);
                       q.push(false, els[j]);
                     } else {
+                      spec.selector = void 0;
                       compiler([els[j]], spec, stringFormatter(d[j]))([els[j]], d[j]);
                     }
                   }
                 } else {
                   stack.unshift(d);
                   q.push(false);
+                  q.push.apply(q, children);
+                  children = [];
                 }
               } else {
                 spec.selector = void 0;
@@ -299,7 +365,7 @@ var plugin = {
             stack.unshift(head);
             q.push(false);
           }
-          q.push.apply(q, e.children);
+          q.push.apply(q, children);
         }
       } else {
         stack.shift();
@@ -316,7 +382,7 @@ var plugin = {
     for (var selector in directive) {
       actions.push(compiler(basis, parseSelector(selector), directive[selector]));
     }
-    return function(element, data, index, elements, collection) {
+    return function renderer(element, data, index, elements, collection) {
       for (var i in actions) {
         actions[i]([element], data, index, elements, collection);
       }
