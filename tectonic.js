@@ -87,7 +87,11 @@ function compiler(root, spec, template) {
       var bindData = format(data, target, index, elements, collection);
       var nodes = find(target, bindData, root);
       for (var i = 0, ii = nodes.length; i < ii; i++) {
-        write(nodes[i], bindData, i, nodes);
+        var boundData = bindData;
+        if (typeof boundData === 'function') {
+          boundData = bindData(data, nodes[i], i, nodes);
+        }
+        write(nodes[i], boundData, i, nodes);
       }
     }
   };
@@ -291,7 +295,7 @@ var plugin = {
     }
     function elementParser(source, finder) {
       var value, basis;
-      var target = finder(source)[0]; //TODO: handle missing
+      var target = finder(source)[0]; //TODO: handle missing or many
       if (spec.append || spec.prepend) {
         basis = finder(root[0])[0];
       }
@@ -420,14 +424,6 @@ var plugin = {
         return filtered;
       };
     }
-    function walkFormatter(path) {
-      return function walkFormatter(data, target) {
-        for (var i = 0, ii = path.length; i < ii && data; i++) {
-          data = data[path[i]];
-        }
-        return data;
-      }
-    }
     function concatenator(parts) {
       return function concatenator() {
         var i, part, cat = "";
@@ -502,21 +498,6 @@ var plugin = {
           }
         }
       }
-    }
-    function walkReader(path) {
-      return function walkReader(data, value) {
-        for (var i = 0, ii = path.length - 1; i < ii; i++) {
-          if (!data[path[i]]) {
-            if (path[i] == parseInt(path[i])) {
-              data[path[i]] = [];
-            } else {
-              data[path[i]] = {};
-            }
-          }
-          data = data[path[i]];
-        }
-        return data[path[i]] = value;
-      };
     }
   },
 
@@ -628,6 +609,15 @@ var plugin = {
   }
 };
 
+function walkFormatter(path) {
+  return function walkFormatter(data, target) {
+    for (var i = 0, ii = path.length; i < ii && data; i++) {
+      data = data[path[i]];
+    }
+    return data;
+  }
+}
+
 function stringFormatter(literal) {
   return function stringFormatter() { return String(literal); };
 }
@@ -695,7 +685,77 @@ function arrayFinder(spec) {
   };
 }
 
-Tectonic.position = function(_, _, i) {
-  return i + 1;
+function walkReader(path) {
+  return function walkReader(data, value) {
+    for (var i = 0, ii = path.length - 1; i < ii; i++) {
+      if (!data[path[i]]) {
+        if (path[i] == parseInt(path[i])) {
+          data[path[i]] = [];
+        } else {
+          data[path[i]] = {};
+        }
+      }
+      data = data[path[i]];
+    }
+    return data[path[i]] = value;
+  };
+}
+
+Tectonic.defineInverse = function(fn, inverse) {
+  if (inverse) {
+    if (typeof inverse === 'function') {
+      fn.inverse = inverse;
+    } else {
+      fn.inverse = function() { throw inverse; };
+    }
+  } else {
+    fn.inverse = function noop() {};
+  }
+  return fn;
 };
-Tectonic.position.inverse = function() {};
+
+Tectonic.position = Tectonic.defineInverse(function(_, _, i) {
+  return i + 1;
+});
+
+Tectonic.toggleClass = function(className, attr, inverse) {
+  var format, read, path;
+  if (attr) {
+    if (typeof attr === 'string') {
+      path = attr.split('.');
+      format = walkFormatter(path);
+      read = walkReader(path);
+    } else if (typeof attr === 'function') {
+      format = attr;
+      read = inverse || format.inverse || function() { throw "Unable to parse, cannot find inverse of function."; };
+    } else {
+      format = walkFormatter(attr);
+      read = walkReader(attr);
+    }
+  } else {
+    format = function(data) { return data; };
+    read = function() { throw "Unable to parse, expected an object."; }
+  }
+  return Tectonic.defineInverse(function() {
+    return function(data, element) {
+      var value = format(data, element);
+      var selected = value === 'false' ? false : Boolean(value);
+      value = element.getAttribute('class') || '';
+      var classList = value.split(/\s+/);
+      var index = classList.indexOf(className);
+      if (index >= 0) {
+        if (!selected) {
+          classList.splice(index, 1);
+          value = classList.join(' ');
+        }
+      } else if (selected) {
+        value += " " + className;
+      }
+      return value.replace(/^\s+|\s+$/g, '');
+    }
+  }, function(data, value) {
+    var classList = value.split(/\s+/);
+    var selected = classList.indexOf(className) >= 0;
+    read(data, selected);
+  });
+};

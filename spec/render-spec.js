@@ -345,6 +345,39 @@ var fixtures = [
     }
   },
   {
+    name:       "renders class attribute with toggle helper",
+    data:       { on: true, off: false },
+    directive:  {
+      ".toggle-on@class": Tectonic.toggleClass('toggle', 'on'),
+      ".toggle-off@class": Tectonic.toggleClass('toggle', 'off')
+    },
+    fixture:    fromString('<a><b class="toggle-on toggle"></b><b class="toggle-on"></b><b class="toggle-off toggle"></b><b class="toggle-off"></b></a>'),
+    expected:   fromString('<a><b class="toggle-on toggle"></b><b class="toggle-on toggle"></b><b class="toggle-off"></b><b class="toggle-off"></b></a>'),
+    exec:       render
+  },
+  {
+    name:       "renders class attribute with computed toggle helper",
+    data:       { list: ['a', 'b'] },
+    directive:  {
+      ".toggle@class": Tectonic.toggleClass('found',
+        function(data, element) {
+          return data.list.indexOf(element.textContent) >= 0;
+        },
+        function() {
+          throw "read function does not have access to the element(s) under parse.";
+        }
+      )
+    },
+    fixture:    fromString('<a><b class="toggle found">a</b><b class="toggle">b</b><b class="toggle found">c</b><b class="toggle">d</b></a>'),
+    expected:   fromString('<a><b class="toggle found">a</b><b class="toggle found">b</b><b class="toggle">c</b><b class="toggle">d</b></a>'),
+    exec:       render,
+    inverse:    function(_, element, directive) {
+      expect(function() {
+        element.parse(directive);
+      }).toThrow("read function does not have access to the element(s) under parse.");
+    }
+  },
+  {
     name:       "renders an input",
     data:       {
       "with-attr": "A",
