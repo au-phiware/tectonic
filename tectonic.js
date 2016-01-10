@@ -181,10 +181,17 @@ var plugin = {
           } else if (spec.prepend && target.childNodes.length) {
             target.insertBefore(value, target.childNodes[0]);
           } else {
-            if (target.childNodes.length) {
-              target.innerHTML = "";
+            if (value.nodeType === 3) {
+              if (target.childNodes.length) {
+                target.innerHTML = "";
+              }
+              target.appendChild(value);
+            } else {
+              if (target.parentNode) {
+                target.parentNode.replaceChild(value, target);
+              }
+              target = value;
             }
-            target.appendChild(value);
           }
         }
       } else {
@@ -195,13 +202,14 @@ var plugin = {
         }
         target.nodeValue = value;
       }
+      return target;
     }
     function arrayWriter(target, value, i, targets) {
       var data = value[i];
       if (loopSpec[1]) {
         (data = {})[loopSpec[1]] = value[i];
       }
-      renderer(target, data, i, targets, value);
+      return renderer(target, data, i, targets, value);
     }
     function attrWriter(target, value) {
       if (target.nodeType === 1) {
@@ -254,6 +262,7 @@ var plugin = {
         }
         target[spec.attr] = value;
       }
+      return target;
     }
   },
 
