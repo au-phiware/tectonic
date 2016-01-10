@@ -611,9 +611,9 @@ var plugin = {
 
 function walkFormatter(path) {
   return function walkFormatter(data, target) {
-    for (var i = 0, ii = path.length; i < ii && data; i++) {
-      data = data[path[i]];
-    }
+    for (var i = 0, ii = path.length; i < ii && data; i++)
+      if (path[i])
+        data = data[path[i]];
     return data;
   }
 }
