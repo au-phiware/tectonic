@@ -82,6 +82,7 @@ var fixtures = [
   {
     name:       "traverse object",
     data:       {"greet": { en: "Hello", fr: "Salut", it: "Ciao" }, "name": "World"},
+    expectedData: {"greet": { en: "Hello" }, "name": "World"},
     directive:  {"span": "greet.en \", \" name '!'"},
     fixture:    fromString('<div><span>Hello</span></div>'),
     expected:   fromString('<div><span>Hello, World!</span></div>'),
@@ -90,6 +91,7 @@ var fixtures = [
   {
     name:       "traverse object with array",
     data:       {"greet": { en: "Hello", fr: "Salut", it: "Ciao" }, "name": "World"},
+    expectedData: {"greet": { it: "Ciao" }},
     directive:  { "span": ["greet", "it"] },
     fixture:    fromString('<div><span>Hello</span></div>'),
     expected:   fromString('<div><span>Ciao</span></div>'),
@@ -223,6 +225,7 @@ var fixtures = [
   {
     name:       "renders filtered and sorted loop",
     data:       {"things": ["World", "PURE", "Sizzle", "NO SHOUTY!"]},
+    expectedData:{"things": ["Sizzle", "World"]},
     directive:  {
       ".thing": {
         "t<-things": { "span": "t" },
@@ -239,6 +242,7 @@ var fixtures = [
   {
     name:       "renders filtered loop",
     data:       {"things": ["World", "PURE", "Sizzle", "NO SHOUTY!"]},
+    expectedData:{"things": ["World", "Sizzle"]},
     directive:  {
       ".thing": {
         "t<-things": { "span": "t" },
@@ -254,6 +258,7 @@ var fixtures = [
   {
     name:       "renders sorted loop",
     data:       {"things": ["World", "PURE", "Sizzle"]},
+    expectedData:{"things": ["PURE", "Sizzle", "World"]},
     directive:  {
       ".thing": {
         sort: void 0,
@@ -267,6 +272,7 @@ var fixtures = [
   {
     name:       "renders sorted loop and leaves data intact",
     data:       {"things": ["World", "PURE", "Sizzle"]},
+    expectedData:{"things": ["PURE", "Sizzle", "World"]},
     directive:  {
       ".thing": {
         sort: void 0,
@@ -316,13 +322,27 @@ var fixtures = [
     data:       { "class": "on" },
     directive:  {
       ".append@class+": 'class',
-      "+.prepend@class": 'class',
+      "+.prepend@class": 'class'
+    },
+    fixture:    fromString('<a><b class="append"></b><b class="prepend"></b></a>'),
+    expected:   fromString('<a><b class="append on"></b><b class="on prepend"></b></a>'),
+    exec:       render
+  },
+  {
+    name:       "renders class attribute with toggle",
+    data:       { "class": "on" },
+    directive:  {
       "-.toggle@class+": 'class',
       "+ .pretoggle@class -": 'class'
     },
-    fixture:    fromString('<a><b class="append"></b><b class="prepend"></b><b class="toggle"></b><b class="toggle on"></b><b class="pretoggle"></b></a>'),
-    expected:   fromString('<a><b class="append on"></b><b class="on prepend"></b><b class="toggle on"></b><b class="toggle"></b><b class="on pretoggle"></b></a>'),
-    exec:       render
+    fixture:    fromString('<a><b class="toggle"></b><b class="toggle on"></b><b class="pretoggle"></b></a>'),
+    expected:   fromString('<a><b class="toggle on"></b><b class="toggle"></b><b class="on pretoggle"></b></a>'),
+    exec:       render,
+    inverse:    function(_, element, directive) {
+      expect(function() {
+        element.parse(directive);
+      }).toThrow("Unable to parse '-.toggle@class+', cannot determine value of toggle.");
+    }
   },
   {
     name:       "renders an input",
@@ -340,11 +360,11 @@ var fixtures = [
     name:       "renders a checkbox",
     data:       {
       "pets": [
-      { "val": "canine", "name": "Dog", "owns": true },
-      { "val": "feline", "name": "Cat", "owns": true },
-      { "val": "rodent", "name": "Rat", "owns": false },
-      { "val": "reptile", "name": "Snake", "owns": "false" },
-      { "val": "avine", "name": "Bird" }
+      { "name": "Dog", "val": "canine", "owns": true },
+      { "name": "Cat", "val": "feline", "owns": true },
+      { "name": "Rat", "val": "rodent", "owns": false },
+      { "name": "Snake", "val": "reptile", "owns": "false" },
+      { "name": "Bird", "val": "avine" }
       ]
     },
     directive:  {
@@ -358,6 +378,15 @@ var fixtures = [
     },
     fixture:    fromString('<form><label><input type="checkbox" value="class"/> </label></form>'),
     expected:   fromString('<form><label><input type="checkbox" value="canine" checked="true"/> Dog</label><label><input type="checkbox" value="feline" checked="true"/> Cat</label><label><input type="checkbox" value="rodent"/> Rat</label><label><input type="checkbox" value="reptile"/> Snake</label><label><input type="checkbox" value="avine"/> Bird</label></form>'),
+    expectedData:{
+      "pets": [
+      { "name": "Dog", "val": "canine", "owns": true },
+      { "name": "Cat", "val": "feline", "owns": true },
+      { "name": "Rat", "val": "rodent", "owns": false },
+      { "name": "Snake", "val": "reptile", "owns": false },
+      { "name": "Bird", "val": "avine", "owns": false }
+      ]
+    },
     exec:       render
   },
   {
@@ -380,6 +409,13 @@ var fixtures = [
     },
     fixture:    fromString('<form class="sizes"><select><option value="XXS">Extra Small</option></select></form>'),
     expected:   fromString('<form class="sizes"><select><option value="S">S - small</option><option value="M" selected="true">M - medium</option><option value="L">L - large</option></select></form>'),
+    expectedData:{
+      "sizes": [
+      { "val": "S", "name": "small", "sel": false },
+      { "val": "M", "name": "medium", "sel": true },
+      { "val": "L", "name": "large", "sel": false }
+      ]
+    },
     exec:       render
   },
   {
@@ -755,7 +791,12 @@ var fixtures = [
     },
     fixture:    fromFile("double-nested-loop", 0),
     expected:   fromFile("double-nested-loop", 1),
-    exec:       render
+    exec:       render,
+    inverse:    function(_, element, directive) {
+      expect(function() {
+        element.parse(directive);
+      }).toThrow("Unable to parse 'td.position', cannot find inverse of function.");
+    }
   },
   {
     name:       "custom formatter in loop",
@@ -764,9 +805,7 @@ var fixtures = [
       "tt": {
         "team<-teams": {
           "+.": "team",
-          ".+": function(element, data, i, elements) {
-            return i + 1;
-          }
+          ".+": Tectonic.position
         }
       }
     },
@@ -775,12 +814,6 @@ var fixtures = [
     exec:       render
   }
 ];
-
-describe("Directives", function() {
-  for (var i = 0, ii = fixtures.length; i < ii; i++) {
-    it(fixtures[i].name, runner(fixtures[i]));
-  }
-});
 
 function runner(fixture) {
   return function() {
@@ -798,6 +831,23 @@ function runner(fixture) {
   }
 }
 
+runner.inverse = function(fixture) {
+  return function() {
+    var expected = fixture.expected();
+    var data = fixture.expectedData || fixture.data;
+    var element = fixture.fixture();
+    if (!data || !element) {
+      if (data) {
+        failed("No fixture specified.");
+      } else {
+        failed("Nothing expected?");
+      }
+    } else {
+      (fixture.inverse || fixture.exec.inverse)(data, fixture.exec(expected, element, fixture.data, fixture.directive), fixture.directive);
+    }
+  }
+}
+
 function failed(message) {
   return function() {
     fail(message);
@@ -805,8 +855,18 @@ function failed(message) {
 }
 
 function render(expected, element, data, directive) {
-  expect(new Tectonic(element).render(data, directive).get().outerHTML)
+  var t = new Tectonic(element);
+  expect(t.render(data, directive).get().outerHTML)
       .toEqual(expected.outerHTML);
+  return t;
+}
+
+render.inverse = function(expected, element, directive) {
+  if (directive) {
+    expect(element.parse(directive)).toEqual(expected);
+  } else {
+    expect("nothing").toBeDefined();
+  }
 }
 
 function autoRender(expected, element, data, directive) {
@@ -829,3 +889,12 @@ function fromFile(name, child) {
     return body.children[child];
   };
 }
+
+describe("Directives", function() {
+  for (var i = 0, ii = fixtures.length; i < ii; i++) {
+    it(fixtures[i].name, runner(fixtures[i]));
+    if (fixtures[i].inverse || fixtures[i].exec.inverse) {
+      it('inverse ' + fixtures[i].name, runner.inverse(fixtures[i]));
+    }
+  }
+});

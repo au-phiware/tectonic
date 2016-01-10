@@ -1,11 +1,29 @@
-function Tectonic(element) {
+function Tectonic(element, basis) {
   if (!(element instanceof Node)) {
     element = element.get(0);
   }
-  var basis = element.cloneNode(true);
+  if (arguments.length < 2) {
+    basis = element.cloneNode(true);
+  }
 
   this.get = function() {
     return element;
+  };
+
+  this.clone = function() {
+    return new Tectonic(element, basis);
+  };
+
+  this.equals = function(otherElement, otherBasis) {
+    switch (arguments.length) {
+      case 2:
+        return element === otherElement && basis === otherBasis;
+      case 1:
+        if (otherElement instanceof Tectonic) {
+          return this === otherElement || otherElement.equals(element, basis);
+        }
+    }
+    return false;
   };
 
   function autoCompile(data, directive) {
@@ -33,12 +51,26 @@ function Tectonic(element) {
     return this;
   };
 
+  this.parse = function(directive) {
+    if (!directive) {
+      throw "Directive missing.";
+    }
+    if (typeof directive !== 'function') {
+      directive = this.compile(directive);
+    }
+    return directive.inverse.call(this);
+  };
+
   this.compile = function(directive) {
     var renderer = plugin.compile([basis], directive);
     var tectonic = this;
-    return function(data) {
-      return renderer(this === tectonic ? element : basis.cloneNode(true), data);
-    }
+    var bounded = function(data) {
+      return renderer(tectonic.equals(this) ? element : basis.cloneNode(true), data);
+    };
+    bounded.inverse = function() {
+      return renderer.inverse(tectonic.equals(this) ? element : basis, {});
+    };
+    return bounded;
   };
 }
 
@@ -46,8 +78,10 @@ function compiler(root, spec, template) {
   var find = plugin.finder(root, spec, template);
   var write = plugin.writer(root, spec, template);
   var format = plugin.formatter(root, spec, template);
+  var parse = plugin.parser(root, spec, template);
+  var read = plugin.reader(root, spec, template);
 
-  return function renderAction(targets, data, index, elements, collection) {
+  var renderAction = function(targets, data, index, elements, collection) {
     for (var j = 0, jj = targets.length; j < jj; j++) {
       var target = targets[j];
       var bindData = format(target, data, index, elements, collection);
@@ -56,7 +90,13 @@ function compiler(root, spec, template) {
         write(nodes[i], bindData, i, nodes);
       }
     }
+  };
+  if (read && parse) {
+    renderAction.inverse = function(source, data) {
+      read(data, parse(source, find));
+    };
   }
+  return renderAction;
 }
 
 function parseSelector(str) {
@@ -191,9 +231,9 @@ var plugin = {
             }
             value = classList.replace(/^ +| +$/g, '');
           } else if (spec.append) {
-            value = target.getAttribute(spec.attr) + ' ' + value;
+            value = target.getAttribute('class') + ' ' + value;
           } else if (spec.prepend) {
-            value = value + ' ' + target.getAttribute(spec.attr);
+            value = value + ' ' + target.getAttribute('class');
           }
           target.setAttribute('class', value);
         } else {
@@ -212,6 +252,105 @@ var plugin = {
         }
         target[spec.attr] = value;
       }
+    }
+  },
+
+  parser: function(root, spec, template) {
+    var loopSpec, renderer;
+    if (spec.attr) {
+      return attrParser;
+    } else if (typeof template === 'object' && !plugin.isArray(template)) {
+      loopSpec = plugin.parseLoopSpec(template);
+      renderer = plugin.compile(plugin.find(root, spec.selector), template[loopSpec[0]]);
+      return arrayParser(loopSpec, renderer);
+    } else {
+      return elementParser;
+    }
+    function arrayParser(loopSpec, renderer) {
+      return function arrayParser(source, finder) {
+        var nodes = plugin.find([source], spec.selector);
+        var array = [], data;
+        for (var i = 0, ii = nodes.length; i < ii; i++) {
+          data = {};
+          renderer.inverse(nodes[i], data);
+          array[i] = data[loopSpec[1]];
+        }
+        return array;
+      }
+    }
+    function elementParser(source, finder) {
+      var value, basis;
+      var target = finder(source)[0]; //TODO: handle missing
+      if (spec.append || spec.prepend) {
+        basis = finder(root[0])[0];
+      }
+      if (target.nodeType === 1) {
+        if (target.tagName.toUpperCase() === 'INPUT') {
+          value = target.getAttribute('value');
+          if (basis) {
+            value = diff(value, basis.getAttribute('value'), spec.append);
+          }
+        } else {
+          value = target.textContent;
+          if (basis) {
+            value = diff(value, basis.textContent, spec.append);
+          }
+        }
+      } else {
+        value = target.nodeValue;
+        if (basis) {
+          value = diff(value, basis.nodeValue, spec.append);
+        }
+      }
+      return value;
+    }
+    function attrParser(source, finder) {
+      var value, basis;
+      var target = finder(source)[0]; //TODO: handle missing
+      if (spec.append || spec.prepend) {
+        basis = finder(root[0])[0];
+      }
+      if (target.nodeType === 1) {
+        if (target.tagName.toUpperCase() === "OPTION" && spec.attr === "selected") {
+          value = target.selected;
+        } else if (target.tagName.toUpperCase() === "INPUT" && spec.attr === "checked") {
+          value = target.checked;
+        } else if (spec.attr === "class" || spec.attr === "className" || spec.attr === "classList") {
+          if (spec.toggle) {
+            throw "Unable to parse '" + spec.raw + "', cannot determine value of toggle.";
+          } else {
+            value = target.getAttribute('class');
+            if (basis) {
+              value = diff(value, basis.getAttribute('class'), spec.append);
+              value = value.replace(/^ +| +$/g, '');
+            }
+          }
+        } else {
+          value = target.getAttribute(spec.attr);
+          if (basis) {
+            value = diff(value, basis.getAttribute(spec.attr), spec.append);
+          }
+        }
+      } else {
+        value = target[spec.attr];
+        if (basis) {
+          value = diff(value, basis[spec.attr], spec.append);
+        }
+      }
+      return value;
+    }
+    function diff(value, original, end) {
+      if (end) {
+        if (value.indexOf(original) === 0) {
+          return value.substr(original.length);
+        }
+      } else {
+        var index = value.indexOf(original);
+        if (index >= 0 /*&& index === value.length - original.length*/) {
+          return value.substr(0, index);
+        }
+      }
+      return value;
     }
   },
 
@@ -251,7 +390,7 @@ var plugin = {
         }
     }
     function arrayFormatter(formatter, template) {
-      return function(target, data) {
+      return function arrayFormatter(target, data) {
         var filtered;
         var array = formatter.apply(this, arguments);
         if (template.filter) {
@@ -271,7 +410,7 @@ var plugin = {
       };
     }
     function walkFormatter(path) {
-      return function(target, data) {
+      return function walkFormatter(target, data) {
         for (var i = 0, ii = path.length; i < ii && data; i++) {
           data = data[path[i]];
         }
@@ -279,7 +418,7 @@ var plugin = {
       }
     }
     function concatenator(parts) {
-      return function() {
+      return function concatenator() {
         var i, part, cat = "";
         for (i in parts) {
           part = parts[i].apply(this, arguments);
@@ -288,6 +427,84 @@ var plugin = {
           }
         }
         return cat;
+      };
+    }
+  },
+
+  reader: function(root, spec, template) {
+    if (typeof template === 'function') {
+      template = template.inverse || function deferReaderException() {
+        throw "Unable to parse '" + spec.raw + "', cannot find inverse of function.";
+      };
+    }
+    switch (typeof template) {
+      case 'function':
+        return template;
+      case 'object':
+        if (plugin.isArray(template)) {
+          return walkReader(template);
+        } else {
+          return walkReader(plugin.parseLoopSpec(template)[3].split('.'));
+        }
+      case 'string':
+        parts = [];
+        search = / *(?:"([^"]*)"|'([^']*)'|([^'" ]+)) */g;
+        while ((found = search.exec(template))) {
+          if (found[3]) {
+            parts.push(walkReader(found[3].split('.')));
+          } else {
+            parts.push(found[1] || found[2]);
+          }
+        }
+        if (parts.length == 1 && typeof parts[0] === 'function') {
+          return parts[0];
+        } else if (parts.length > 1) {
+          return deconcatenator(parts);
+        } else {
+          return function emptyReader() {};
+        }
+    }
+    function deconcatenator(parts) {
+      return function deconcatenator(data, value) {
+        var part, partValue, index;
+        for (var i = 0, ii = parts.length; i < ii; i++) {
+          part = parts[i];
+          switch (typeof part) {
+            case 'string':
+              value = value.substr(part.length);
+              break;
+            case 'function':
+              if (i + 1 === ii || typeof parts[i + 1] !== 'function') {
+                if (i + 1 !== ii) {
+                  // Next part is a string (because it's not a function)
+                  index = value.indexOf(parts[++i]);
+                  partValue = value.substr(0, index);
+                  value = value.substr(index + parts[i].length);
+                } else {
+                  partValue = value;
+                }
+                part(data, partValue);
+              } else {
+                throw "Unable to parse '" + spec.raw + "', cannot separate consecutive data paths that have been concatenated together.";
+              }
+              break;
+          }
+        }
+      }
+    }
+    function walkReader(path) {
+      return function walkReader(data, value) {
+        for (var i = 0, ii = path.length - 1; i < ii; i++) {
+          if (!data[path[i]]) {
+            if (path[i] == parseInt(path[i])) {
+              data[path[i]] = [];
+            } else {
+              data[path[i]] = {};
+            }
+          }
+          data = data[path[i]];
+        }
+        return data[path[i]] = value;
       };
     }
   },
@@ -382,21 +599,30 @@ var plugin = {
     for (var selector in directive) {
       actions.push(compiler(basis, parseSelector(selector), directive[selector]));
     }
-    return function renderer(element, data, index, elements, collection) {
+    var renderer = function(element, data, index, elements, collection) {
       for (var i in actions) {
         actions[i]([element], data, index, elements, collection);
       }
       return element;
     };
+    renderer.inverse = function(element, data) {
+      for (var i in actions) {
+        if (actions[i].inverse) {
+          actions[i].inverse(element, data);
+        }
+      }
+      return data;
+    };
+    return renderer;
   }
 };
 
 function stringFormatter(literal) {
-  return function() { return String(literal); };
+  return function stringFormatter() { return String(literal); };
 }
 
 function arrayFinder(spec) {
-  return function(target, data, root) {
+  return function arrayFinder(target, data, root) {
     var length = data && data.length || 0;
     var ownerDocument = target.ownerDocument || document;
     var nodes = plugin.find([target], spec.selector);
@@ -457,3 +683,8 @@ function arrayFinder(spec) {
     return nodes;
   };
 }
+
+Tectonic.position = function(_, _, i) {
+  return i + 1;
+};
+Tectonic.position.inverse = function() {};
