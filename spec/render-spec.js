@@ -648,11 +648,11 @@ var fixtures = [
       var tectonic = new Tectonic(element);
       var directive = tectonic.compile({
         "li": {
-          "child <- children": {
-            "a": "child.name",
-            "a@onclick": "\"alert('\"child.name\"');\"",
-            ".children": function(element, data) {
-              return directive(data.child);
+          "<- children": {
+            "a": "name",
+            "a@onclick": "\"alert('\"name\"');\"",
+            ".children": function() {
+              return directive.apply(this, arguments);
             }
           }
         }

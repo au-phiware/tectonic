@@ -84,7 +84,7 @@ function compiler(root, spec, template) {
   var renderAction = function(targets, data, index, elements, collection) {
     for (var j = 0, jj = targets.length; j < jj; j++) {
       var target = targets[j];
-      var bindData = format(target, data, index, elements, collection);
+      var bindData = format(data, target, index, elements, collection);
       var nodes = find(target, bindData, root);
       for (var i = 0, ii = nodes.length; i < ii; i++) {
         write(nodes[i], bindData, i, nodes);
@@ -197,8 +197,10 @@ var plugin = {
       }
     }
     function arrayWriter(target, value, i, targets) {
-      var data = {};
-      data[loopSpec[1]] = value[i];
+      var data = value[i];
+      if (loopSpec[1]) {
+        (data = {})[loopSpec[1]] = value[i];
+      }
       renderer(target, data, i, targets, value);
     }
     function attrWriter(target, value) {
@@ -390,7 +392,7 @@ var plugin = {
         }
     }
     function arrayFormatter(formatter, template) {
-      return function arrayFormatter(target, data) {
+      return function arrayFormatter(data, target) {
         var filtered;
         var array = formatter.apply(this, arguments);
         if (template.filter) {
@@ -410,7 +412,7 @@ var plugin = {
       };
     }
     function walkFormatter(path) {
-      return function walkFormatter(target, data) {
+      return function walkFormatter(data, target) {
         for (var i = 0, ii = path.length; i < ii && data; i++) {
           data = data[path[i]];
         }
