@@ -356,7 +356,11 @@ var plugin = {
             }
           }
         } else {
-          value = target.getAttribute(spec.attr);
+          if (target.tagName.toUpperCase() === "INPUT" && spec.attr === "value") {
+            value = target.value;
+          } else {
+            value = target.getAttribute(spec.attr);
+          }
           if (basis) {
             value = diff(value, basis.getAttribute(spec.attr), spec.append);
           }
