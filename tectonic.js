@@ -186,11 +186,11 @@ var plugin = {
       if (target.nodeType === 1) {
         if (target.tagName.toUpperCase() === 'INPUT') {
           if (spec.append) {
-            value = target.getAttribute('value') + value;
+            value = target.value + value;
           } else if (spec.prepend) {
-            value = value + target.getAttribute('value');
+            value = value + target.value;
           }
-          target.setAttribute('value', value);
+          target.value = value;
         } else {
           if (!(value instanceof Node)) {
             value = document.createTextNode(value);
@@ -316,7 +316,7 @@ var plugin = {
       }
       if (target.nodeType === 1) {
         if (target.tagName.toUpperCase() === 'INPUT') {
-          value = target.getAttribute('value');
+          value = target.value;
           if (basis) {
             value = diff(value, basis.getAttribute('value'), spec.append);
           }
@@ -356,11 +356,7 @@ var plugin = {
             }
           }
         } else {
-          if (target.tagName.toUpperCase() === "INPUT" && spec.attr === "value") {
-            value = target.value;
-          } else {
-            value = target.getAttribute(spec.attr);
-          }
+          value = target.getAttribute(spec.attr);
           if (basis) {
             value = diff(value, basis.getAttribute(spec.attr), spec.append);
           }
