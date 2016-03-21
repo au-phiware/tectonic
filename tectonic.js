@@ -184,7 +184,7 @@ var plugin = {
     }
     function elementWriter(target, value) {
       if (target.nodeType === 1) {
-        if (target.tagName.toUpperCase() === 'INPUT') {
+        if (target.tagName.toUpperCase() === 'INPUT' || target.tagName.toUpperCase() === 'TEXTAREA') {
           if (spec.append) {
             value = target.value + value;
           } else if (spec.prepend) {
@@ -315,7 +315,7 @@ var plugin = {
         basis = finder(root[0])[0];
       }
       if (target.nodeType === 1) {
-        if (target.tagName.toUpperCase() === 'INPUT') {
+        if (target.tagName.toUpperCase() === 'INPUT' || target.tagName.toUpperCase() === 'TEXTAREA') {
           value = target.value;
           if (basis) {
             value = diff(value, basis.getAttribute('value'), spec.append);
