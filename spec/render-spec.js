@@ -386,8 +386,14 @@ var fixtures = [
       "prepend": "A"
     },
     fixture:    fromString('<form><input class="with-elem"/><input class="with-attr@value"/><input class="append+" value="A"/><input class="+prepend" value="B"/></form>'),
-    expected:   fromString('<form><input class="with-elem" value="E"/><input class="with-attr" value="A"/><input class="append" value="AB"/><input class="prepend" value="AB"/></form>'),
-    exec:       render
+    expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
+    exec:       function(expected, element, data, directive) {
+      var t = render(expected, element, data, directive);
+      expect(element.children.item(0).value).toEqual('E');
+      expect(element.children.item(1).value).toEqual('A');
+      expect(element.children.item(2).value).toEqual('AB');
+      expect(element.children.item(3).value).toEqual('AB');
+    }
   },
   {
     name:       "renders a checkbox",
