@@ -1,5 +1,25 @@
 jasmine.getFixtures().fixturesPath = '/base/spec/javascripts/fixtures';
 
+function render(expected, element, data, directive) {
+  var t = new Tectonic(element);
+  expect(t.render(data, directive).get().outerHTML)
+      .toEqual(expected.outerHTML);
+  return t;
+}
+
+render.inverse = function(expected, element, directive) {
+  if (directive) {
+    expect(element.parse(directive)).toEqual(expected);
+  } else {
+    expect("nothing").toBeDefined();
+  }
+}
+
+function autoRender(expected, element, data, directive) {
+  expect(new Tectonic(element).autoRender(data, directive).get().outerHTML)
+      .toEqual(expected.outerHTML);
+}
+
 var fixtures = [
   {
     name:       'auto renders',
@@ -378,7 +398,7 @@ var fixtures = [
     }
   },
   {
-    name:       "renders an input",
+    name:       "autorenders an input",
     data:       {
       "with-attr": "A",
       "with-elem": "E",
@@ -394,6 +414,71 @@ var fixtures = [
       expect(element.children.item(2).value).toEqual('AB');
       expect(element.children.item(3).value).toEqual('AB');
     }
+  },
+  {
+    name:       "autorenders a textarea",
+    data:       {
+      "with-elem": "E",
+      "append": "B",
+      "prepend": "A"
+    },
+    fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append+">A</textarea><textarea class="+prepend">B</textarea></form>'),
+    expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
+    exec:       function(expected, element, data, directive) {
+      var t = render(expected, element, data, directive);
+      expect(element.children.item(0).value).toEqual('E');
+      expect(element.children.item(1).value).toEqual('AB');
+      expect(element.children.item(2).value).toEqual('AB');
+    }
+  },
+  {
+    name:       "renders an input",
+    data:       {
+      "with-attr": "A",
+      "with-elem": "E",
+      "append": "B",
+      "prepend": "A"
+    },
+    directive: {
+      ".with-elem": "with-elem",
+      ".with-attr@value": "with-attr",
+      ".append+": "append",
+      "+.prepend": "prepend"
+    },
+    fixture:    fromString('<form><input class="with-elem"/><input class="with-attr"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
+    expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
+    exec:       function(expected, element, data, directive) {
+      var t = render(expected, element, data, directive);
+      expect(element.children.item(0).value).toEqual('E');
+      expect(element.children.item(1).value).toEqual('A');
+      expect(element.children.item(2).value).toEqual('AB');
+      expect(element.children.item(3).value).toEqual('AB');
+      return t;
+    },
+    inverse:    render.inverse
+  },
+  {
+    name:       "renders a textarea",
+    data:       {
+      "with-elem": "E",
+      "append": "B",
+      "prepend": "A"
+    },
+    directive: {
+      ".with-elem": "with-elem",
+      ".append+": "append",
+      "+.prepend": "prepend"
+    },
+    fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
+    expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
+    exec:       function(expected, element, data, directive) {
+      var t = render(expected, element, data, directive);
+      expect(element.children.item(0).value).toEqual('E');
+      expect(element.children.item(1).value).toEqual('AB');
+      expect(element.children.item(2).value).toEqual('AB');
+      return t;
+    },
+    inverse:    render.inverse
   },
   {
     name:       "renders a checkbox",
@@ -891,26 +976,6 @@ function failed(message) {
   return function() {
     fail(message);
   };
-}
-
-function render(expected, element, data, directive) {
-  var t = new Tectonic(element);
-  expect(t.render(data, directive).get().outerHTML)
-      .toEqual(expected.outerHTML);
-  return t;
-}
-
-render.inverse = function(expected, element, directive) {
-  if (directive) {
-    expect(element.parse(directive)).toEqual(expected);
-  } else {
-    expect("nothing").toBeDefined();
-  }
-}
-
-function autoRender(expected, element, data, directive) {
-  expect(new Tectonic(element).autoRender(data, directive).get().outerHTML)
-      .toEqual(expected.outerHTML);
 }
 
 function fromString(html) {

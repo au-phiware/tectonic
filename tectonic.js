@@ -318,7 +318,11 @@ var plugin = {
         if (target.tagName.toUpperCase() === 'INPUT' || target.tagName.toUpperCase() === 'TEXTAREA') {
           value = target.value;
           if (basis) {
-            value = diff(value, basis.getAttribute('value'), spec.append);
+            if (target.tagName.toUpperCase() === 'INPUT') {
+              value = diff(value, basis.getAttribute('value'), spec.append);
+            } else {
+              value = diff(value, basis.textContent, spec.append);
+            }
           }
         } else {
           value = target.textContent;
