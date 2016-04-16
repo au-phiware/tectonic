@@ -68,7 +68,7 @@ function Tectonic(element, basis) {
 
   this.parse = function(directive) {
     if (!directive) {
-      throw "Directive missing.";
+      throw new Error("Directive missing.");
     }
     if (typeof directive !== 'function') {
       directive = this.compile(directive);
@@ -123,7 +123,7 @@ function parseSelector(str) {
   var match = str.match(/^([+-])? *([^\@\+]+)? *(\@([^ ]+?))? *([+-])?$/);
 
   if (!match)
-    throw "invalid selector: '" + str + "'";
+    throw new Error("invalid selector: '" + str + "'");
 
   spec.prepend  = match[1] === '+';
   spec.shift    = match[1] === '-';
@@ -351,7 +351,7 @@ var plugin = {
           value = target.checked;
         } else if (spec.attr === "class" || spec.attr === "className" || spec.attr === "classList") {
           if (spec.toggle) {
-            throw "Unable to parse '" + spec.raw + "', cannot determine value of toggle.";
+            throw new Error("Unable to parse '" + spec.raw + "', cannot determine value of toggle.");
           } else {
             value = target.getAttribute('class');
             if (basis) {
@@ -460,7 +460,7 @@ var plugin = {
   reader: function(root, spec, template) {
     if (typeof template === 'function') {
       template = template.inverse || function deferReaderException() {
-        throw "Unable to parse '" + spec.raw + "', cannot find inverse of function.";
+        throw new Error("Unable to parse '" + spec.raw + "', cannot find inverse of function.");
       };
     }
     switch (typeof template) {
@@ -511,7 +511,7 @@ var plugin = {
                 }
                 part(data, partValue);
               } else {
-                throw "Unable to parse '" + spec.raw + "', cannot separate consecutive data paths that have been concatenated together.";
+                throw new Error("Unable to parse '" + spec.raw + "', cannot separate consecutive data paths that have been concatenated together.");
               }
               break;
           }
@@ -529,7 +529,7 @@ var plugin = {
         // TODO: ensure no other key matches /<[-=]/
       }
     }
-    throw "Expected looping directive (<-) is missing.";
+    throw new Error("Expected looping directive (<-) is missing.");
   },
 
   autoCompile: function(element, directive, data) {
@@ -725,7 +725,7 @@ Tectonic.defineInverse = function(fn, inverse) {
     if (typeof inverse === 'function') {
       fn.inverse = inverse;
     } else {
-      fn.inverse = function() { throw inverse; };
+      fn.inverse = function() { throw new Error(inverse); };
     }
   } else {
     fn.inverse = function noop() {};
@@ -746,14 +746,14 @@ Tectonic.toggleClass = function(className, attr, inverse) {
       read = walkReader(path);
     } else if (typeof attr === 'function') {
       format = attr;
-      read = inverse || format.inverse || function() { throw "Unable to parse, cannot find inverse of function."; };
+      read = inverse || format.inverse || function() { throw new Error("Unable to parse, cannot find inverse of function."); };
     } else {
       format = walkFormatter(attr);
       read = walkReader(attr);
     }
   } else {
     format = function(data) { return data; };
-    read = function() { throw "Unable to parse, expected an object."; }
+    read = function() { throw new Error("Unable to parse, expected an object."); }
   }
   return Tectonic.defineInverse(function() {
     return function(data, element) {

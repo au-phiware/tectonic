@@ -323,7 +323,7 @@ var fixtures = [
     expected:   fromString('<div><div class="thing">Hello, <span>World</span>.</div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div></div>'),
     exec: function(expected, element, data, directive) {
       expect(function() { new Tectonic(element).render(data, directive); })
-        .toThrow("invalid selector: 'thing@'");
+        .toThrow(new Error("invalid selector: 'thing@'"));
     }
   },
   {
@@ -334,7 +334,7 @@ var fixtures = [
     expected:   fromString('<div><div class="thing">Hello, <span>World</span>.</div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div></div>'),
     exec: function(expected, element, data, directive) {
       expect(function() { new Tectonic(element).render(data, directive); })
-        .toThrow("Expected looping directive (<-) is missing.");
+        .toThrow(new Error("Expected looping directive (<-) is missing."));
     }
   },
   {
@@ -361,7 +361,7 @@ var fixtures = [
     inverse:    function(_, element, directive) {
       expect(function() {
         element.parse(directive);
-      }).toThrow("Unable to parse '-.toggle@class+', cannot determine value of toggle.");
+      }).toThrow(new Error("Unable to parse '-.toggle@class+', cannot determine value of toggle."));
     }
   },
   {
@@ -919,7 +919,7 @@ var fixtures = [
     inverse:    function(_, element, directive) {
       expect(function() {
         element.parse(directive);
-      }).toThrow("Unable to parse 'td.position', cannot find inverse of function.");
+      }).toThrow(new Error("Unable to parse 'td.position', cannot find inverse of function."));
     }
   },
   {
