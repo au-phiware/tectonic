@@ -1,6 +1,6 @@
 {
   "name": "tectonic",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A revival of Beebole's PURE library.",
   "main": "tectonic.js",
   "scripts": {

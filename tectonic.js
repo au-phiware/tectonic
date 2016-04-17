@@ -106,7 +106,14 @@ function compiler(root, spec, template) {
         if (typeof boundData === 'function') {
           boundData = bindData(data, nodes[i], i, nodes);
         }
-        write(nodes[i], boundData, i, nodes);
+        var newNode = write(nodes[i], boundData, i, nodes);
+        if (newNode !== nodes[i]) {
+          if (nodes[i].parentNode) {
+            nodes[i].parentNode.replaceChild(newNode, nodes[i]);
+          }
+          nodes[i] = newNode;
+        }
+
       }
     }
   };
