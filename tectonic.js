@@ -127,18 +127,16 @@ function compiler(root, spec, template) {
 
 function parseSelector(str) {
   var spec = { raw: str };
-  var match = str.match(/^([+-])? *([^\@\+]+)? *(\@([^ ]+?))? *([+-])?$/);
+  var match = str.match(/^ *([^@]*?)? *(\@([^ ]+?))? *(:(before|after|toggle))? *$/);
 
   if (!match)
     throw new Error("invalid selector: '" + str + "'");
 
-  spec.prepend  = match[1] === '+';
-  spec.shift    = match[1] === '-';
-  spec.selector = match[2];
-  spec.attr     = match[4];
-  spec.append   = match[5] === '+';
-  spec.pop      = match[5] === '-';
-  spec.toggle   = spec.prepend && spec.pop || spec.shift && spec.append;
+  spec.prepend  = match[5] === 'before';
+  spec.selector = match[1];
+  spec.attr     = match[3];
+  spec.append   = match[5] === 'after';
+  spec.toggle   = match[5] === 'toggle';
 
   return spec;
 }
@@ -260,10 +258,8 @@ var plugin = {
             var classList = ' ' + target.getAttribute('class') + ' ';
             if (classList.indexOf(' ' + value + ' ') >= 0) {
               classList = classList.replace(' ' + value + ' ', ' ');
-            } else if (spec.append) {
-              classList += value;
             } else {
-              classList = value + classList;
+              classList += value;
             }
             value = classList.replace(/^ +| +$/g, '');
           } else if (spec.append) {
