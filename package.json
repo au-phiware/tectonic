@@ -1,9 +1,10 @@
 {
   "name": "tectonic",
-  "version": "0.0.3",
+  "version": "0.1.0-SNAPSHOT",
   "description": "A revival of Beebole's PURE library.",
   "main": "tectonic.js",
   "scripts": {
+    "doc": "docco tectonic.js",
     "test": "echo 'Point your browser to http://localhost:9876/base/spec/index.html or http://localhost:9876/base/coverage/'; karma start"
   },
   "repository": {
@@ -25,6 +26,7 @@
   },
   "homepage": "https://github.com/au-phiware/tectonic#readme",
   "devDependencies": {
+    "docco": "^0.7.0",
     "dom-compare": "^0.2.1",
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
