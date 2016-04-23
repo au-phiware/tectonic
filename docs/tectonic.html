@@ -1,0 +1,3470 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>tectonic.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>tectonic.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <pre><code>(c) <span class="hljs-number">2015</span><span class="hljs-number">-2016</span> Corin Lawson
+
+Permission is hereby granted, free <span class="hljs-keyword">of</span> charge, to any person obtaining a copy <span class="hljs-keyword">of</span>
+<span class="hljs-keyword">this</span> software and associated documentation files (the <span class="hljs-string">"Software"</span>), to deal <span class="hljs-keyword">in</span>
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies <span class="hljs-keyword">of</span>
+the Software, and to permit persons to whom the Software is furnished to <span class="hljs-keyword">do</span> so,
+subject to the following conditions:
+
+The above copyright notice and <span class="hljs-keyword">this</span> permission notice shall be included <span class="hljs-keyword">in</span> all
+copies or substantial portions <span class="hljs-keyword">of</span> the Software.
+
+THE SOFTWARE IS PROVIDED <span class="hljs-string">"AS IS"</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">root, factory</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>AMD. Register as an anonymous module.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {
+    define([], factory);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Node. Does not work with strict CommonJS, but only CommonJS-like
+environments that support module.exports, like Node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">module</span> === <span class="hljs-string">'object'</span> &amp;&amp; <span class="hljs-built_in">module</span>.exports) {
+    <span class="hljs-built_in">module</span>.exports = factory();
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Browser globals (root is window)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">else</span> {
+    root.Tectonic = factory();
+  }
+}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h1 id="introduction">Introduction</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Tectonic is a functional rendering engine for DOM nodes, heavily inspired by
+<a href="https://github.com/pure/pure">Beebole’s PURE</a> rendering engine.
+It ascribes to PURE’s unobtusive philosophy, whereby HTML code is completely
+free of any application logic or new syntax and JavaScript code is
+uninhibited by presentational concerns. This achieved by both PURE and
+Tectonic by the use of a directive object that marries HTML referenced by CSS
+selectors to properties in your application’s data.
+Where Tectonic departs from PURE is in the use of functions, known as
+renderers, to directly manipulate DOM nodes. This permits Tectonic to
+provide two-way data flow via a <code>parse</code> method, which makes use of an inverse
+function that is attached to a renderer.
+Tectonic takes the stance that it is your responsiblity to provide a context
+to any function that you provide. I.e. Tectonic won’t be using <code>call</code> or
+<code>apply</code> on functions that you define, consider using
+<a href="http://underscorejs.org/">underscore</a>‘s <code>bind</code> method or simply defining
+your methods inside a closure.</p>
+<p>The directive object’s keys are used to find elements and/or element
+attributes in the DOM. That element’s content or its attribute is then updated
+according to the directive’s value for that key. The directive’s value can
+specify a literal string, a property in a given data object, or a combination
+of both. It can also duplicate the element and recursively render those
+elements for each item of an array in the given data object.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <h1 id="constructor">Constructor</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>A Tectonic object wraps the specified <code>element</code> and defines methods for
+compile, render, parse, etc. An optional <code>basis</code> may also be specified; think
+of the basis as an untouched version of <code>element</code>, which will be used by
+Tectonic as a point of reference.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Tectonic</span>(<span class="hljs-params">element, basis</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p><code>element</code> is expected to be a DOM <code>Node</code>, otherwise we assume it’s a
+different Tectonic object and get its element.  Note this also works well
+with jQuery objects.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> (!(element <span class="hljs-keyword">instanceof</span> Node)) {
+    element = element.get(<span class="hljs-number">0</span>);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>The most common use case is to wrap an element that’s already in the
+browser’s DOM before any DOM changes, hence the element is currently
+<em>untouched</em> so the basis is simply a clone of the element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">arguments</span>.length &lt; <span class="hljs-number">2</span>) {
+    basis = element.cloneNode(<span class="hljs-literal">true</span>);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Accessor for this object’s <code>element</code>. Think <code>jQuery#get</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.get = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> element;
+  };
+
+  <span class="hljs-keyword">this</span>.clone = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">deep</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Creates a deep copy of this object. Note that returned object’s <code>element</code>
+will be detached from the browser’s DOM.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (deep) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Tectonic(element.cloneNode(<span class="hljs-literal">true</span>), basis.cloneNode(<span class="hljs-literal">true</span>));
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Creates a shallow copy of this object.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Tectonic(element, basis);
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Compares the specified <code>other</code> object to this object.
+When a single argument is provided, returns <code>true</code> if and only if <code>other</code>
+is an instance of Tectonic and both its <code>element</code> and <code>basis</code> are identical
+to this object’s <code>element</code> and <code>basis</code>, respectively.
+When two arguments are specified, returns <code>true</code> if and only if <code>other</code> and
+<code>otherBasis</code> are identical to this object’s <code>element</code> and <code>basis</code>,
+respectively.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.equals = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">other, otherBasis</span>) </span>{
+    <span class="hljs-keyword">switch</span> (<span class="hljs-built_in">arguments</span>.length) {
+      <span class="hljs-keyword">case</span> <span class="hljs-number">2</span>:
+        <span class="hljs-keyword">return</span> element === other &amp;&amp; basis === otherBasis;
+      <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:
+        <span class="hljs-keyword">if</span> (other <span class="hljs-keyword">instanceof</span> Tectonic) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> === other || other.equals(element, basis);
+        }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Updates this object’s <code>element</code> to reflect the specified <code>data</code> according
+to the specified <code>directive</code>. Returns this object for chaining.
+The <code>directive</code> may be an object (to be compiled) or a pre-compiled
+renderer function.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.render = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, directive</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Behave like <code>autoRender</code> when there’s no directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!directive) {
+      directive = autoCompile(data);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Accept a pre-compiled renderer (or any function really!), otherwise
+create a renderer function by compiling the <code>directive</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> directive !== <span class="hljs-string">'function'</span>) {
+      directive = <span class="hljs-keyword">this</span>.compile(directive);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Execute the renderer!
+Although the common use case is for the renderer to simply make changes
+directly to <code>element</code>, we are nevertheless prepared for the renderer to
+create a new element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> newElement = directive.call(<span class="hljs-keyword">this</span>, data);
+    <span class="hljs-keyword">if</span> (newElement !== element) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>If it is the case that a new element was created then replace this
+object’s <code>element</code> with the <code>newElement</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (element.parentNode) {
+        element.parentNode.replaceChild(newElement, element);
+      }
+      element = newElement;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Return this object to support chaining.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Creates a data object from this object’s <code>element</code> according to the
+specified <code>directive</code>. Returns an object that contains the data that would
+be required to <code>render</code> this object, that would result in this object’s
+<code>element</code>. Note that this can be called before <code>render</code>, consider using
+<code>parse</code> to extract default values from your browser’s DOM.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.parse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">directive</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>There’s no autoParse here…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!directive) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Directive missing."</span>);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Accept a pre-compiled renderer, otherwise create a renderer function by
+compiling the <code>directive</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> directive !== <span class="hljs-string">'function'</span>) {
+      directive = <span class="hljs-keyword">this</span>.compile(directive);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Parse is only posible because <a href="#compilers"><code>compile</code></a> attaches an
+<code>inverse</code> function to the renderer function.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> directive.inverse.call(<span class="hljs-keyword">this</span>);
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Create a renderer and its inverse function, according to the specified
+<code>directive</code>. Returns a function that can be used in place of a directive to
+<code>render</code> and <code>parse</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.compile = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">directive</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>The real work is done by <a href="#compilers"><code>Tectonic.plugin.compile</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> renderer = Tectonic.plugin.compile([basis], directive);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>The resulting function is curried with this object’s <code>element</code> or a clone
+of <code>element</code> if it is called within a different context.
+For example you can produce many nodes like so</p>
+<pre><code><span class="hljs-keyword">var</span> render = <span class="hljs-keyword">new</span> Tectonic(element).compile(directive);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> models) {
+  <span class="hljs-built_in">document</span>.body.appendChild(render(models[i]));
+}
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> tectonic = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> bounded = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
+      <span class="hljs-keyword">return</span> renderer(tectonic.equals(<span class="hljs-keyword">this</span>) ? element : basis.cloneNode(<span class="hljs-literal">true</span>), data);
+    };
+    bounded.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">return</span> renderer.inverse(tectonic.equals(<span class="hljs-keyword">this</span>) ? element : basis, {});
+    };
+    <span class="hljs-keyword">return</span> bounded;
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Like compile but also inspects this object’s <code>element</code>‘s class names for
+additional directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">autoCompile</span>(<span class="hljs-params">data, directive</span>) </span>{
+    <span class="hljs-keyword">return</span> Tectonic.plugin.autoCompile(element, directive || {}, data);
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Almost exactly like <code>render</code>, except this object’s <code>element</code>‘s class names
+are inspected for additional directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">this</span>.autoRender = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, directive</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.render(data, autoCompile(data, directive));
+  };
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h1 id="selectors">Selectors</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>Creates an object that specifies what part of the DOM should be manipulated,
+given the specified key from a directive. The directive’s key is broken into
+four optional parts.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseSelector</span>(<span class="hljs-params">str</span>) </span>{
+  <span class="hljs-keyword">var</span> spec = { raw: str };
+  <span class="hljs-keyword">var</span> match = str.match(<span class="hljs-regexp">/^([+-])? *([^\@\+]+)? *(\@([^ ]+?))? *([+-])?$/</span>);
+
+  <span class="hljs-keyword">if</span> (!match)
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"invalid selector: '"</span> + str + <span class="hljs-string">"'"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>The first part may be a <code>+</code>, signifying that content must be prepended, or
+<code>-</code>, signifying that content should be shifted off from the front.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  spec.prepend  = match[<span class="hljs-number">1</span>] === <span class="hljs-string">'+'</span>;
+  spec.shift    = match[<span class="hljs-number">1</span>] === <span class="hljs-string">'-'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>The second part specifies a (CSS) selector used to find the element to be
+updated.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  spec.selector = match[<span class="hljs-number">2</span>];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>The third, if present, must be preceeded by an <code>@</code>, and names the attribute
+of the element to be updated.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  spec.attr     = match[<span class="hljs-number">4</span>];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>The fourth, may be a <code>+</code>, signifying that content must be appended, or
+<code>-</code>, signifying that content should be popped off from the end.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  spec.append   = match[<span class="hljs-number">5</span>] === <span class="hljs-string">'+'</span>;
+  spec.pop      = match[<span class="hljs-number">5</span>] === <span class="hljs-string">'-'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>If both first and fourth parts are present and opposing, the that signifies
+that the content must be switch between two alternative values.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  spec.toggle   = spec.prepend &amp;&amp; spec.pop || spec.shift &amp;&amp; spec.append;
+
+  <span class="hljs-keyword">return</span> spec;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <h1 id="compiler">Compiler</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>Creates a renderer function for one key-value pair (i.e. the specified <code>spec</code>
+and <code>template</code> pair). Note that the specified <code>basis</code> is an array of DOM
+nodes to support recursively calling <a href="#compilers"><code>compile</code></a> with the results
+<a href="#section-79"><code>Tectonic.plugin.find</code></a> as the <code>basis</code> (e.g. see
+<a href="#section-90"><code>Tectonic.plugin.loopWriter</code></a>).
+This method is responsible for coordinating the five methods that is
+generated from the <a href="#plugin"><code>Tectonic.plugin</code></a>, namely a finder, writer,
+formatter, parser and reader. To that end, no assumption is made about the
+information that these five plugin methods need, therefore they are called
+with all the information that we have.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">compiler</span>(<span class="hljs-params">basis, spec, template</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>The real work of finding the correct element to update is done by
+the function returned from <a href="#finders"><code>Tectonic.plugin.finder</code></a>.
+The resulting <code>find</code> function mostly likely doesn’t need <code>template</code> but
+finder does use it to despatch on its type. Likewise, <code>basis</code> is unlikely
+to be used except in the event that the element in the DOM has already been
+removed by a previous renderer.
+The important peice of information that finder needs is <code>spec.selector</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> find = Tectonic.plugin.finder(basis, spec, template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>The real work of updating the DOM is done by the function returned from
+<a href="#writers"><code>Tectonic.plugin.writer</code></a>.
+Similar to finder, writer is unlikely to need <code>basis</code> or <code>template</code>.
+The important information that writer needs is <code>spec.attr</code>, <code>spec.append</code>,
+<code>spec.prepend</code>, etc.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> write = Tectonic.plugin.writer(basis, spec, template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>The real work of finding the content to place into the DOM is done by
+the function returned from <a href="#formatters"><code>Tectonic.plugin.formatter</code></a>.
+Unlike finder and writer, formatter is unlikely to need <code>spec</code> or <code>basis</code>.
+The important information is almost exclusively contained with in template.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> format = Tectonic.plugin.formatter(basis, spec, template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>The real work of extracting data back out of the DOM is done by
+the function returned from <a href="#parsers"><code>Tectonic.plugin.parser</code></a>.
+It is the converse of write, and uses the same information contained in
+<code>spec</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> parse = Tectonic.plugin.parser(basis, spec, template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>The real work of putting data back into a data object is done by the
+function returned from <a href="#readers"><code>Tectonic.plugin.reader</code></a>.
+It is the converse of format, and as such the important information is
+almost exclusively contained with in template.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> read = Tectonic.plugin.reader(basis, spec, template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>These renderers take a signgle <code>target</code> element to be rendered with <code>data</code>.
+The other arguments are optional and typically only present when handling
+loop directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> renderAction = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">target, data, index, elements, values</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>The same data will be applied to every node selected by <code>spec</code>.
+The common use case will be a single node for the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> bindData = format(data, target, index, elements, values);
+    <span class="hljs-keyword">var</span> nodes = find(target, bindData, basis);
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = nodes.length; i &lt; ii; i++) {
+      <span class="hljs-keyword">var</span> boundData = bindData;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Data can be tailored to each and every node by supplying a function
+that returns a function as the value of the directive. E.g. see
+<a href="#section-147"><code>Tectonic.toggleClass</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> boundData === <span class="hljs-string">'function'</span>) {
+        boundData = bindData(data, nodes[i], i, nodes);
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>Now, update the DOM.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> newNode = write(nodes[i], boundData, i, nodes);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Typically <code>write</code> simply updates the DOM, but if a different node is
+produced, update the DOM with that node instead.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (newNode !== nodes[i]) {
+        <span class="hljs-keyword">if</span> (newNode &amp;&amp; nodes[i].parentNode) {
+          nodes[i].parentNode.replaceChild(newNode, nodes[i]);
+        }
+        nodes[i] = newNode;
+      }
+    }
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Parsing relies on <code>parse</code> and <code>read</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">if</span> (parse &amp;&amp; read) {
+    renderAction.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">source, data</span>) </span>{
+      <span class="hljs-keyword">return</span> read(data, parse(source, find));
+    };
+  }
+  <span class="hljs-keyword">return</span> renderAction;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <h1 id="plugin">Plugin</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Used by <a href="#formatters"><code>Tectonic.plugin.formatter</code></a> and
+<a href="#readers"><code>Tectonic.plugin.reader</code></a> to break a template string into literal
+strings and paths of a property in a data object.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> stringDataPattern = <span class="hljs-regexp">/ *(?:"([^"]*)"|'([^']*)'|([^'" ]+)) */g</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Most of the core functionality of Tectonic is exposed here, in order to allow
+other authors to extend the functionality. For example, authors working with
+SVG could override <a href="#writers"><code>Tectonic.plugin.writer</code></a> and
+<a href="#parsers"><code>Tectonic.plugin.parser</code></a> (or some of its helpers, such as
+<code>attrWriter</code> and <code>loopParser</code>); authors using Backbone models could override
+<code>Tectonic.plugin.reader</code> and <a href="#formatters"><code>Tectonic.plugin.formatter</code></a> (or
+just <code>propFormatter</code> and <code>propReader</code>); or if you wish to use jQuery/Sizzle,
+<a href="#section-79"><code>Tectonic.plugin.find</code></a> needs to be overridden.</p>
+<p>The five plugin methods used in <a href="#compiler"><code>compiler</code></a> above, act as despatchers based on
+either the spec or the template.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Tectonic.plugin = {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <h2 id="finders">Finders</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Returns a function to retrieve an array of Nodes that need to be updated.
+The returned function’s parameters must be a DOM <code>Node</code> and data object.
+The returned function’s return value must be an array of nodes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  finder: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">if</span> (!spec.selector || <span class="hljs-regexp">/^ *\.? *$/</span>.test(spec.selector)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.topFinder(basis, spec, template);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> template === <span class="hljs-string">'object'</span> &amp;&amp; !<span class="hljs-keyword">this</span>.isArray(template)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.loopFinder(basis, spec, template);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.queryFinder(basis, spec, template);
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <p>Used in the case of when the directive refers to the current element being
+rendered. All the selectors in the following directive will result in
+calling this method.
+    {
+      ‘’: ‘empty string’,
+      ‘@attr’: ‘also works with attributes’,
+      ‘.’: ‘dot’,
+      ‘.@attr’: ‘as you would expect’
+    }</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  topFinder: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">topFinder</span>(<span class="hljs-params">target, data</span>) </span>{
+      <span class="hljs-keyword">return</span> [target];
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <p>Used in the case of looping directives.
+Additionally, this method also ensures that there is the correct number of
+elements, one for each item in the loop.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  loopFinder: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loopFinder</span>(<span class="hljs-params">target, data, basis</span>) </span>{
+      <span class="hljs-keyword">var</span> length = data &amp;&amp; data.length || <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">var</span> ownerDocument = target.ownerDocument || <span class="hljs-built_in">document</span>;
+      <span class="hljs-keyword">var</span> nodes = p.find([target], spec.selector);
+      <span class="hljs-keyword">var</span> i, ii = nodes.length;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
+              </div>
+              <p>When there is no data…</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!length) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-63">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-63">&#182;</a>
+              </div>
+              <p>…remove all the nodes in the DOM.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (ii) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-64">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-64">&#182;</a>
+              </div>
+              <p>First, remove all but one node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> (i = <span class="hljs-number">1</span>; i &lt; ii; i++) {
+            nodes[i].parentNode.removeChild(nodes[i]);
+          }
+          <span class="hljs-keyword">if</span> (ownerDocument) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-65">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              <p>Replace the last node with a marker so that we may insert new
+nodes in the future</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            nodes[<span class="hljs-number">0</span>].parentNode.replaceChild(ownerDocument.createComment(spec.raw), nodes[<span class="hljs-number">0</span>]);
+          } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
+              </div>
+              <p>Otherwise remove the last node if a valid document cannot be
+found.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            nodes[<span class="hljs-number">0</span>].parentNode.removeChild(nodes[<span class="hljs-number">0</span>]);
+          }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-67">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-67">&#182;</a>
+              </div>
+              <p>No data means no nodes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> [];
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-68">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-68">&#182;</a>
+              </div>
+              <p>When the number of nodes matches the number of data items. There’s
+nothing more to do.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (length === ii) {
+        <span class="hljs-keyword">return</span> nodes;
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-69">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-69">&#182;</a>
+              </div>
+              <p>Otherwise, add or remove nodes as needed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-70">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-70">&#182;</a>
+              </div>
+              <p>Newly created nodes are sourced from the original DOM element. This
+permits easy striping behaviour.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> newNodes = p.find(basis, spec.selector);
+        <span class="hljs-keyword">var</span> sentinal, lastNode, mod = newNodes.length;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-71">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-71">&#182;</a>
+              </div>
+              <p>When no nodes are found in the DOM we must search for the specail
+marker that is placed into the DOM when there is no data. Here we
+perform a breadth-first search starting with <code>target</code> and exiting
+when the comment matching the directive’s key is found.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!ii) {
+          lastNode = newNodes[<span class="hljs-number">0</span>].cloneNode(<span class="hljs-literal">true</span>);
+          <span class="hljs-keyword">var</span> q = [target];
+          <span class="hljs-keyword">while</span> (q.length) {
+            <span class="hljs-keyword">var</span> comment = q.pop();
+            <span class="hljs-keyword">if</span> (comment.nodeType === <span class="hljs-number">8</span> &amp;&amp; comment.nodeValue === spec.raw) {
+              comment.parentNode.replaceChild(lastNode, comment);
+              q.length = <span class="hljs-number">0</span>;
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (comment.childNodes.length) {
+              q.splice.apply(q, [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>].concat(<span class="hljs-built_in">Array</span>.prototype.slice.call(comment.childNodes)));
+            }
+          }
+          ii = <span class="hljs-number">1</span>;
+          nodes = [lastNode];
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-72">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-72">&#182;</a>
+              </div>
+              <p>Otherwise, take note of the lastNode so that we may insert more nodes
+as needed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (length !== ii) {
+          lastNode = nodes[ii - <span class="hljs-number">1</span>];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-73">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-73">&#182;</a>
+              </div>
+              <p>Insertion will be either before the element after the last matching
+node or (because <code>lastNode</code> is infact the last node of it’s parent)
+insertion will be achieved by appending to the parent node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> insert;
+          sentinal = lastNode.nextSibling;
+          lastNode = lastNode.parentNode;
+          <span class="hljs-keyword">if</span> (lastNode) {
+            insert = sentinal ? <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newNode</span>) </span>{
+              lastNode.insertBefore(newNode, sentinal);
+              nodes.push(newNode);
+            } : <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newNode</span>) </span>{
+              lastNode.appendChild(newNode);
+              nodes.push(newNode);
+            };
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-74">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-74">&#182;</a>
+              </div>
+              <p>Alternatively, there is no parent, hence nowhere to insert.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> {
+            insert = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">newNode</span>) </span>{
+              nodes.push(newNode);
+            };
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-75">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-75">&#182;</a>
+              </div>
+              <p>Continue to insert nodes while the number of nodes is less then the
+number of items in the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> (i = <span class="hljs-built_in">Math</span>.min(ii, length); i &lt; length; i++) {
+            insert(newNodes[i % mod].cloneNode(<span class="hljs-literal">true</span>));
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-76">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-76">&#182;</a>
+              </div>
+              <p>Alternatively, remove nodes until the number of nodes matches the
+number of items in the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> (; i &lt; ii; i++) {
+            lastNode.removeChild(nodes[i]);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-77">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-77">&#182;</a>
+              </div>
+              <p>And remove nodes from the returned array as necessary.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          nodes.length = length;
+        }
+      }
+      <span class="hljs-keyword">return</span> nodes;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-78">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-78">&#182;</a>
+              </div>
+              <p>Used in the default case, passes <code>spec.selector</code> to
+<a href="#section-79"><code>Tectonic.plugin.find</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  queryFinder: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">queryFinder</span>(<span class="hljs-params">target, data</span>) </span>{
+      <span class="hljs-keyword">return</span> p.find([target], spec.selector);
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-79">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-79">&#182;</a>
+              </div>
+              <p>Finds elements within the specified array of Nodes, <code>contexts</code>, matching
+the specified <code>selector</code>. Returns an array of Nodes.</p>
+<p>The default implementation uses <code>querySelectorAll</code> and this method is used
+by various other plugin methods. This is the best point for a jQuery/Sizzle
+(or similar) plugin to introduce its own functionality.</p>
+<p>It’s important to return a real array (not a <code>NodeList</code>) for use in other
+plugin methods (e.g. <code>loopFinder</code>).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  find: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">contexts, selector</span>) </span>{
+    <span class="hljs-keyword">var</span> elements = [];
+    <span class="hljs-keyword">var</span> found, i, ii, j, jj;
+    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, ii = contexts.length; i &lt; ii; i++) {
+      found = contexts[i].querySelectorAll(selector);
+      <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>, jj = found.length; j &lt; jj; j++) {
+        elements.push(found[j]);
+      }
+    }
+    <span class="hljs-keyword">return</span> elements;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-80">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-80">&#182;</a>
+              </div>
+              <h2 id="writers">Writers</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-81">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-81">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-82">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-82">&#182;</a>
+              </div>
+              <p>Returns a function to update the DOM for a given <code>spec</code>.
+The returned function’s parameters must be a <code>target</code> DOM <code>Node</code> and data
+object.  The returned function’s return value must be the DOM <code>Node</code>
+written to, if this node is not the <code>target</code> then the <code>target</code> will be
+replaced with the returned node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  writer: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">if</span> (spec.attr) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.attrWriter(basis, spec, template);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> template === <span class="hljs-string">'object'</span> &amp;&amp; !<span class="hljs-keyword">this</span>.isArray(template)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.loopWriter(basis, spec, template);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.elementWriter(basis, spec, template);
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-83">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-83">&#182;</a>
+              </div>
+              <p>Used in the case where <code>spec</code> refers to an element’s attribute.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  attrWriter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">attrWriter</span>(<span class="hljs-params">target, value</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-84">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-84">&#182;</a>
+              </div>
+              <p>Attribute selectors are particularly useful for elements.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (target.nodeType === <span class="hljs-number">1</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-85">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-85">&#182;</a>
+              </div>
+              <p>As a convenience, handle dropdown boxes specially.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">"OPTION"</span> &amp;&amp; spec.attr === <span class="hljs-string">"selected"</span>) {
+          <span class="hljs-keyword">var</span> selected = value === <span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-built_in">Boolean</span>(value);
+          target.selected = selected;
+          <span class="hljs-keyword">if</span> (selected) {
+            target.setAttribute(<span class="hljs-string">"selected"</span>, value);
+          } <span class="hljs-keyword">else</span> {
+            target.removeAttribute(<span class="hljs-string">"selected"</span>);
+          }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-86">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-86">&#182;</a>
+              </div>
+              <p>Check and radio boxes also require specail handling.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">"INPUT"</span> &amp;&amp; spec.attr === <span class="hljs-string">"checked"</span>) {
+          <span class="hljs-keyword">var</span> checked = value === <span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-built_in">Boolean</span>(value);
+          target.checked = checked;
+          <span class="hljs-keyword">if</span> (checked) {
+            target.setAttribute(<span class="hljs-string">"checked"</span>, value);
+          } <span class="hljs-keyword">else</span> {
+            target.removeAttribute(<span class="hljs-string">"checked"</span>);
+          }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-87">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-87">&#182;</a>
+              </div>
+              <p>Treat class attribute (and aliases) specially.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.attr === <span class="hljs-string">"class"</span> || spec.attr === <span class="hljs-string">"className"</span> || spec.attr === <span class="hljs-string">"classList"</span>) {
+          <span class="hljs-keyword">if</span> (spec.toggle) {
+            <span class="hljs-keyword">var</span> classList = <span class="hljs-string">' '</span> + target.getAttribute(<span class="hljs-string">'class'</span>) + <span class="hljs-string">' '</span>;
+            <span class="hljs-keyword">if</span> (classList.indexOf(<span class="hljs-string">' '</span> + value + <span class="hljs-string">' '</span>) &gt;= <span class="hljs-number">0</span>) {
+              classList = classList.replace(<span class="hljs-string">' '</span> + value + <span class="hljs-string">' '</span>, <span class="hljs-string">' '</span>);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.append) {
+              classList += value;
+            } <span class="hljs-keyword">else</span> {
+              classList = value + classList;
+            }
+            value = classList.replace(<span class="hljs-regexp">/^ +| +$/g</span>, <span class="hljs-string">''</span>);
+          } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.append) {
+            value = target.getAttribute(<span class="hljs-string">'class'</span>) + <span class="hljs-string">' '</span> + value;
+          } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+            value = value + <span class="hljs-string">' '</span> + target.getAttribute(<span class="hljs-string">'class'</span>);
+          }
+          target.setAttribute(<span class="hljs-string">'class'</span>, value);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-88">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-88">&#182;</a>
+              </div>
+              <p>Otherwise, use <code>setAttribute</code> with <code>spec.attr</code> as-is and support
+append and prepend.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">if</span> (spec.append) {
+            value = target.getAttribute(spec.attr) + value;
+          } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+            value = value + target.getAttribute(spec.attr);
+          }
+          target.setAttribute(spec.attr, value);
+        }
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-89">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-89">&#182;</a>
+              </div>
+              <p>Attribute selectors might also be useful for other node types, but
+since other node types do not have a <code>setAttribute</code> method then we’ll
+just assign values directly to properties of the <code>target</code> node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">if</span> (spec.append) {
+          value = target[spec.attr] + value;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+          value = value + target[spec.attr];
+        }
+        target[spec.attr] = value;
+      }
+      <span class="hljs-keyword">return</span> target;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-90">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-90">&#182;</a>
+              </div>
+              <p>Used in the case of looping directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  loopWriter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-91">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-91">&#182;</a>
+              </div>
+              <p>Find the key that contains the loop spec (e.g. <code>&#39;&lt;-&#39;</code>).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> loopSpec = <span class="hljs-keyword">this</span>.parseLoopSpec(template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-92">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-92">&#182;</a>
+              </div>
+              <p>Recursively call <a href="#compilers"><code>compile</code></a> where a subtree of <code>basis</code> becomes the new
+<code>basis</code> and the object referenced by <code>loopSpec</code> becomes the new
+directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">this</span>.compile(<span class="hljs-keyword">this</span>.find(basis, spec.selector), loopSpec.directive);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loopWriter</span>(<span class="hljs-params">target, items, i, targets</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-93">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-93">&#182;</a>
+              </div>
+              <p>An item of the array becomes the data for the recursive call.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> data = items[i];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-94">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-94">&#182;</a>
+              </div>
+              <p>The lefthand side of <code>&lt;-</code>, if present, is used to refer to the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (loopSpec.lhs) {
+        (data = {})[loopSpec.lhs] = items[i];
+      }
+      <span class="hljs-keyword">return</span> renderer(target, data, i, targets, items);
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-95">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-95">&#182;</a>
+              </div>
+              <p>Used in the case where <code>spec</code> refers to an element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  elementWriter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elementWriter</span>(<span class="hljs-params">target, value</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-96">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-96">&#182;</a>
+              </div>
+              <p>When <code>target</code> and <code>value</code> are the same, there’s nothing to do.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (target !== value) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-97">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-97">&#182;</a>
+              </div>
+              <p>Particularly useful for elements.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (target.nodeType === <span class="hljs-number">1</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-98">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-98">&#182;</a>
+              </div>
+              <p><code>value</code> will probably need to be appended, hence we need a node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> valueNode = value;
+          <span class="hljs-keyword">if</span> (!(value <span class="hljs-keyword">instanceof</span> Node)) {
+            valueNode = <span class="hljs-built_in">document</span>.createTextNode(value);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-99">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-99">&#182;</a>
+              </div>
+              <p>Since input elements do not allow child nodes it is more useful to
+treat the <code>value</code> property as its content. This behaviour also
+works well for textareas.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (value !== valueNode &amp;&amp; (target.tagName.toUpperCase() === <span class="hljs-string">'INPUT'</span> || target.tagName.toUpperCase() === <span class="hljs-string">'TEXTAREA'</span>)) {
+            <span class="hljs-keyword">if</span> (spec.append) {
+              value = target.value + value;
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+              value = value + target.value;
+            }
+            target.value = value;
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-100">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-100">&#182;</a>
+              </div>
+              <p>Appending is straightforward and happens to be equivalent to
+prepend when <code>target</code> is already empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.append || spec.prepend &amp;&amp; !target.childNodes.length) {
+            target.appendChild(valueNode);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-101">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-101">&#182;</a>
+              </div>
+              <p>Prepend is now straightforward since <code>target</code> is not empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+            target.insertBefore(valueNode, target.childNodes[<span class="hljs-number">0</span>]);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-102">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-102">&#182;</a>
+              </div>
+              <p>When <code>value</code> is text, hold back from replacing the entire node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (value !== valueNode) {
+            <span class="hljs-keyword">if</span> (target.childNodes.length) {
+              target.innerHTML = <span class="hljs-string">""</span>;
+            }
+            target.appendChild(valueNode);
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-103">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-103">&#182;</a>
+              </div>
+              <p>Otherwise, let the renderer complete the replacement.
+See <a href="#section-47"><code>renderAction</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> target = value;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-104">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-104">&#182;</a>
+              </div>
+              <p>To extend the functionality to other node types, simply use
+<code>nodeValue</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!(value <span class="hljs-keyword">instanceof</span> Node)) {
+          <span class="hljs-keyword">if</span> (spec.append) {
+            value = target.nodeValue + value;
+          } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.prepend) {
+            value = value + target.nodeValue;
+          }
+          target.nodeValue = value;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-105">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-105">&#182;</a>
+              </div>
+              <p>Otherwise, let the renderer complete the replacement.
+See <a href="#section-47"><code>renderAction</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> target = value;
+      }
+      <span class="hljs-keyword">return</span> target;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-106">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-106">&#182;</a>
+              </div>
+              <h2 id="formatters">Formatters</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-107">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-107">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-108">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-108">&#182;</a>
+              </div>
+              <p>Returns a function to find, extract and prepare, from a data object, the
+content to be written into the DOM.
+The returned function’s parameters must be the data object and the target
+DOM <code>Node</code>.
+The returned function’s return value can be either a string that will be
+set as the content of the target element or attribute or an element, in
+which case the target node will be replaced.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  formatter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> key, found, parts;
+    <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">typeof</span> template) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'function'</span>:
+        <span class="hljs-keyword">return</span> template;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'object'</span>:
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.isArray(template)) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.propFormatter(basis, spec, template);
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.loopFormatter(basis, spec, template);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-109">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-109">&#182;</a>
+              </div>
+              <p>Strings specify either a path of a property in the data object, or a
+literal string or both. Literal strings can be surrounded by either
+single or double quotes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">case</span> <span class="hljs-string">'string'</span>:
+        parts = [];
+        <span class="hljs-keyword">while</span> ((found = stringDataPattern.exec(template))) {
+          <span class="hljs-keyword">if</span> (found[<span class="hljs-number">3</span>]) {
+            parts.push(<span class="hljs-keyword">this</span>.propFormatter(basis, spec, found[<span class="hljs-number">3</span>].split(<span class="hljs-string">'.'</span>)));
+          } <span class="hljs-keyword">else</span> {
+            parts.push(<span class="hljs-keyword">this</span>.stringFormatter(basis, spec, found[<span class="hljs-number">1</span>] || found[<span class="hljs-number">2</span>]));
+          }
+        }
+        <span class="hljs-keyword">if</span> (parts.length == <span class="hljs-number">1</span>) {
+          <span class="hljs-keyword">return</span> parts[<span class="hljs-number">0</span>];
+        }
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (parts.length &gt; <span class="hljs-number">1</span>) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.concatenator(parts);
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.emptyFormatter();
+        }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.emptyFormatter();
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-110">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-110">&#182;</a>
+              </div>
+              <p>Used in the case where the data should be treated as a literal string.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  stringFormatter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, literal</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">stringFormatter</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(literal); };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-111">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-111">&#182;</a>
+              </div>
+              <p>Used for directives that do not specify either a function, object, data
+property, nor literal string.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  emptyFormatter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">emptyFormatter</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>; };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-112">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-112">&#182;</a>
+              </div>
+              <p>Used for directives that specify a property in a data object. The <code>path</code>
+argument must be an array of strings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  propFormatter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, path</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">propFormatter</span>(<span class="hljs-params">data, target</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-113">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-113">&#182;</a>
+              </div>
+              <p>Stop following the path as soon as data is a false-y.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = path.length; i &lt; ii &amp;&amp; data; i++)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-114">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-114">&#182;</a>
+              </div>
+              <p>Treat empty string in <code>path</code> as no-op.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (path[i])
+          data = data[path[i]];
+      <span class="hljs-keyword">return</span> data;
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-115">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-115">&#182;</a>
+              </div>
+              <p>Used in the case of looping directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  loopFormatter: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-116">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-116">&#182;</a>
+              </div>
+              <p>The righthand side specifies the property in the data that is the array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> formatter = <span class="hljs-keyword">this</span>.propFormatter(basis, spec, <span class="hljs-keyword">this</span>.parseLoopSpec(template).rhs.split(<span class="hljs-string">'.'</span>));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-117">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-117">&#182;</a>
+              </div>
+              <p>The array will be used without further processing unless sort or filter
+is specified.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (!(<span class="hljs-string">'sort'</span> <span class="hljs-keyword">in</span> template) &amp;&amp; !template.filter) {
+      <span class="hljs-keyword">return</span> formatter;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loopFormatter</span>(<span class="hljs-params">data, target</span>) </span>{
+      <span class="hljs-keyword">var</span> filtered;
+      <span class="hljs-keyword">var</span> array = formatter.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+      <span class="hljs-keyword">if</span> (template.filter) {
+        filtered = [];
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = array.length; i &lt; ii; i++) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-118">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-118">&#182;</a>
+              </div>
+              <p>Execute the <code>filter</code> function bound to the loop spec, providing it
+with the item, index and array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (template.filter(array[i], i, array)) {
+            filtered.push(array[i]);
+          }
+        }
+      } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-119">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-119">&#182;</a>
+              </div>
+              <p>Do not attempt to sort the original array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        filtered = <span class="hljs-built_in">Array</span>.prototype.slice.call(array);
+      }
+      <span class="hljs-keyword">if</span> (<span class="hljs-string">'sort'</span> <span class="hljs-keyword">in</span> template) {
+        filtered.sort(template.sort);
+      }
+      <span class="hljs-keyword">return</span> filtered;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-120">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-120">&#182;</a>
+              </div>
+              <p>Returns a function that executes each function of <code>parts</code> in turn and
+concatenates each, returning the result.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  concatenator: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">parts</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concatenator</span>(<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">var</span> i, part, cat = <span class="hljs-string">""</span>;
+      <span class="hljs-keyword">for</span> (i <span class="hljs-keyword">in</span> parts) {
+        part = parts[i].apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> part !== <span class="hljs-string">'undefined'</span>) {
+          cat += part;
+        }
+      }
+      <span class="hljs-keyword">return</span> cat;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-121">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-121">&#182;</a>
+              </div>
+              <h2 id="parsers">Parsers</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-122">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-122">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-123">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-123">&#182;</a>
+              </div>
+              <p>Returns a function to recontruct, from the DOM, the value to be placed in a
+data object.
+The returned function’s parameters must be a <code>source</code> node from the DOM and
+a <code>finder</code> function (such as a function returned by
+<a href="#finders"><code>Tectonic.plugin.finder</code></a>). The <code>finder</code> function may be used to
+find nodes within <code>source</code> or <code>basis</code>.
+The returned function’s return value must be the value to be placed into a
+reconstructed data object.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  parser: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">if</span> (spec.attr) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.attrParser(basis, spec, template);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> template === <span class="hljs-string">'object'</span> &amp;&amp; !<span class="hljs-keyword">this</span>.isArray(template)) {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.loopParser(basis, spec, template);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.elementParser(basis, spec, template);
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-124">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-124">&#182;</a>
+              </div>
+              <p>Used in the case of looping directives.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  loopParser: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-125">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-125">&#182;</a>
+              </div>
+              <p>Find the key that contains the loop spec (e.g. <code>&#39;&lt;-&#39;</code>).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> loopSpec = <span class="hljs-keyword">this</span>.parseLoopSpec(template);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-126">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-126">&#182;</a>
+              </div>
+              <p>Recursively call <a href="#compilers"><code>Tectonic.plugin.compile</code></a> where a subtree
+of <code>basis</code> becomes the new <code>basis</code> and the object referenced by
+<code>loopSpec</code> becomes the new directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">this</span>.compile(<span class="hljs-keyword">this</span>.find(basis, spec.selector), loopSpec.directive);
+    <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loopParser</span>(<span class="hljs-params">source, finder</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-127">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-127">&#182;</a>
+              </div>
+              <p>Each node in the DOM corresponds to one item in the returned array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> nodes = p.find([source], spec.selector);
+      <span class="hljs-keyword">var</span> array = [], data;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = nodes.length; i &lt; ii; i++) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-128">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-128">&#182;</a>
+              </div>
+              <p>Recontruct the data from the DOM node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        data = renderer.inverse(nodes[i], data = {});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-129">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-129">&#182;</a>
+              </div>
+              <p>The lefthand side of <code>&lt;-</code>, if present, is used to refer to the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (loopSpec.lhs) {
+          data = data[loopSpec.lhs];
+        }
+        array[i] = data;
+      }
+      <span class="hljs-keyword">return</span> array;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-130">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-130">&#182;</a>
+              </div>
+              <p>Used in the case where <code>spec</code> refers to an element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  elementParser: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elementParser</span>(<span class="hljs-params">source, finder</span>) </span>{
+      <span class="hljs-keyword">var</span> value, original;
+      <span class="hljs-keyword">var</span> target = finder(source)[<span class="hljs-number">0</span>]; <span class="hljs-comment">//<span class="hljs-doctag">TODO:</span> handle missing or many</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-131">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-131">&#182;</a>
+              </div>
+              <p>When appending or prepending, also find the same element in the basis
+in order to compare later.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (spec.append || spec.prepend) {
+        original = finder(basis[<span class="hljs-number">0</span>])[<span class="hljs-number">0</span>];
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-132">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-132">&#182;</a>
+              </div>
+              <p>Particularly useful for elements.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (target.nodeType === <span class="hljs-number">1</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-133">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-133">&#182;</a>
+              </div>
+              <p>Since input elements do not allow child nodes it is more useful to
+treat the <code>value</code> property as its content. This behaviour also works
+well for textareas.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">'INPUT'</span> || target.tagName.toUpperCase() === <span class="hljs-string">'TEXTAREA'</span>) {
+          value = target.value;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-134">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-134">&#182;</a>
+              </div>
+              <p>Given that we earlier found the same element from the <code>basis</code>,
+compare <code>value</code> to the original value and find the difference.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (original) {
+            <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">'INPUT'</span>) {
+              value = p.diff(value, original.getAttribute(<span class="hljs-string">'value'</span>), spec.append);
+            } <span class="hljs-keyword">else</span> {
+              value = p.diff(value, original.textContent, spec.append);
+            }
+          }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-135">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-135">&#182;</a>
+              </div>
+              <p>Otherwise <code>textContent</code> is considered to be the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> {
+          value = target.textContent;
+          <span class="hljs-keyword">if</span> (original) {
+            value = p.diff(value, original.textContent, spec.append);
+          }
+        }
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-136">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-136">&#182;</a>
+              </div>
+              <p>To extend the functionality to other node types, simply use
+<code>nodeValue</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">else</span> {
+        value = target.nodeValue;
+        <span class="hljs-keyword">if</span> (original) {
+          value = p.diff(value, original.nodeValue, spec.append);
+        }
+      }
+      <span class="hljs-keyword">return</span> value;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-137">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-137">&#182;</a>
+              </div>
+              <p>Used in the case where <code>spec</code> refers to an element’s attribute.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  attrParser: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">attrParser</span>(<span class="hljs-params">source, finder</span>) </span>{
+      <span class="hljs-keyword">var</span> value, original;
+      <span class="hljs-keyword">var</span> target = finder(source)[<span class="hljs-number">0</span>]; <span class="hljs-comment">//<span class="hljs-doctag">TODO:</span> handle missing</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-138">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-138">&#182;</a>
+              </div>
+              <p>When appending or prepending, also find the same element in the basis
+in order to compare later.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (spec.append || spec.prepend) {
+        original = finder(basis[<span class="hljs-number">0</span>])[<span class="hljs-number">0</span>];
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-139">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-139">&#182;</a>
+              </div>
+              <p>Attribute selectors are particularly useful for elements.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (target.nodeType === <span class="hljs-number">1</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-140">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-140">&#182;</a>
+              </div>
+              <p>Both <code>selected</code> and <code>checked</code> attributes are booleans.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">"OPTION"</span> &amp;&amp; spec.attr === <span class="hljs-string">"selected"</span>) {
+          value = target.selected;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (target.tagName.toUpperCase() === <span class="hljs-string">"INPUT"</span> &amp;&amp; spec.attr === <span class="hljs-string">"checked"</span>) {
+          value = target.checked;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-141">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-141">&#182;</a>
+              </div>
+              <p>Treat class attribute (and aliases) specially.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.attr === <span class="hljs-string">"class"</span> || spec.attr === <span class="hljs-string">"className"</span> || spec.attr === <span class="hljs-string">"classList"</span>) {
+          <span class="hljs-keyword">if</span> (spec.toggle) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unable to parse '"</span> + spec.raw + <span class="hljs-string">"', cannot determine value of toggle."</span>);
+          } <span class="hljs-keyword">else</span> {
+            value = target.getAttribute(<span class="hljs-string">'class'</span>);
+            <span class="hljs-keyword">if</span> (original) {
+              value = p.diff(value, original.getAttribute(<span class="hljs-string">'class'</span>), spec.append);
+              value = value.replace(<span class="hljs-regexp">/^ +| +$/g</span>, <span class="hljs-string">''</span>);
+            }
+          }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-142">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-142">&#182;</a>
+              </div>
+              <p>For all other attributes of elements use <code>getAttribute</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> {
+          value = target.getAttribute(spec.attr);
+          <span class="hljs-keyword">if</span> (original) {
+            value = p.diff(value, original.getAttribute(spec.attr), spec.append);
+          }
+        }
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-143">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-143">&#182;</a>
+              </div>
+              <p>For other node types simply use properties of the <code>target</code> node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">else</span> {
+        value = target[spec.attr];
+        <span class="hljs-keyword">if</span> (original) {
+          value = p.diff(value, original[spec.attr], spec.append);
+        }
+      }
+      <span class="hljs-keyword">return</span> value;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-144">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-144">&#182;</a>
+              </div>
+              <p>If the specified <code>original</code> string is located in tne specified <code>value</code>
+string, then return the proceeding portion if <code>end</code> is true or the
+preceeding portion if <code>end</code> is <code>false</code>. Otherwise, return an empty string.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  diff: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value, original, end</span>) </span>{
+    <span class="hljs-keyword">var</span> index = value.indexOf(original);
+    <span class="hljs-keyword">if</span> (index &gt;= <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">if</span> (end) {
+        <span class="hljs-keyword">return</span> value.substr(index + original.length);
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> value.substr(<span class="hljs-number">0</span>, index);
+      }
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-145">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-145">&#182;</a>
+              </div>
+              <h2 id="readers">Readers</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-146">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-146">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-147">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-147">&#182;</a>
+              </div>
+              <p>Returns a function to place reconstructed values from the DOM back into a
+data object.
+The returned function’s parameters must be a <code>data</code> object and the
+reconstructed <code>value</code>.
+The returned function’s return value must be the <code>data</code> object. Typically,
+the <code>data</code> argument is simply passed through (after modification).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  reader: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, template</span>) </span>{
+    <span class="hljs-keyword">var</span> i;
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> template === <span class="hljs-string">'function'</span>) {
+      template = template.inverse || <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deferReaderException</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unable to parse '"</span> + spec.raw + <span class="hljs-string">"', cannot find inverse of function."</span>);
+      };
+    }
+    <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">typeof</span> template) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'function'</span>:
+        <span class="hljs-keyword">return</span> template;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'object'</span>:
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.isArray(template)) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.propReader(basis, spec, template);
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.propReader(basis, spec, <span class="hljs-keyword">this</span>.parseLoopSpec(template).rhs.split(<span class="hljs-string">'.'</span>));
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-148">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-148">&#182;</a>
+              </div>
+              <p>As per <a href="#formatters"><code>Tectonic.plugin.formatter</code></a> strings may be any
+combination of literal strings (surrounded by either single or double
+quotes) or a path of a property in the data object.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">case</span> <span class="hljs-string">'string'</span>:
+        i = <span class="hljs-number">-1</span>;
+        parts = [];
+        <span class="hljs-keyword">while</span> ((found = stringDataPattern.exec(template))) {
+          <span class="hljs-keyword">if</span> (found[<span class="hljs-number">3</span>]) {
+            parts.push(<span class="hljs-keyword">this</span>.propReader(basis, spec, found[<span class="hljs-number">3</span>].split(<span class="hljs-string">'.'</span>)));
+            i++;
+          } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-number">0</span> || <span class="hljs-keyword">typeof</span> parts[i] == <span class="hljs-string">'function'</span>) {
+            parts.push(found[<span class="hljs-number">1</span>] || found[<span class="hljs-number">2</span>]);
+            i++;
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-149">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-149">&#182;</a>
+              </div>
+              <p>Otherwise, treat the two strings as one.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> {
+            parts[i] += found[<span class="hljs-number">1</span>] || found[<span class="hljs-number">2</span>];
+          }
+        }
+        <span class="hljs-keyword">if</span> (parts.length == <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-keyword">typeof</span> parts[<span class="hljs-number">0</span>] === <span class="hljs-string">'function'</span>) {
+          <span class="hljs-keyword">return</span> parts[<span class="hljs-number">0</span>];
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (parts.length &gt; <span class="hljs-number">1</span>) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.deconcatenator(parts);
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.emptyReader(basis, spec, template);
+        }
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-150">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-150">&#182;</a>
+              </div>
+              <p>A reader that does nothing simply returns the data object (i.e. the first
+argument).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  emptyReader: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> identity; },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-151">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-151">&#182;</a>
+              </div>
+              <p>Set a property in the data object.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  propReader: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, spec, path</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">propReader</span>(<span class="hljs-params">data, value</span>) </span>{
+      <span class="hljs-keyword">var</span> target = data;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = path.length - <span class="hljs-number">1</span>; i &lt; ii; i++) {
+        <span class="hljs-keyword">if</span> (!target[path[i]]) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-152">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-152">&#182;</a>
+              </div>
+              <p>If the property looks like a non-negative number then it should
+probably be an array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (path[i] == <span class="hljs-built_in">parseInt</span>(path[i]) &amp;&amp; path[i] &gt;= <span class="hljs-number">0</span>) {
+            target[path[i]] = [];
+          } <span class="hljs-keyword">else</span> {
+            target[path[i]] = {};
+          }
+        }
+        target = target[path[i]];
+      }
+      target[path[i]] = value;
+      <span class="hljs-keyword">return</span> data;
+    };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-153">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-153">&#182;</a>
+              </div>
+              <p>Returns a reader function that consumes the <code>value</code> by either discarding
+literal strings or other readers.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  deconcatenator: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">parts</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deconcatenator</span>(<span class="hljs-params">data, value</span>) </span>{
+      <span class="hljs-keyword">var</span> part, partValue, index;
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>, ii = parts.length; i &lt; ii; i++) {
+        part = parts[i];
+        <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">typeof</span> part) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-154">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-154">&#182;</a>
+              </div>
+              <p>When <code>part</code> is a reader it will consume <code>value</code> up to the next
+string.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">case</span> <span class="hljs-string">'function'</span>:
+            <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span> === ii || <span class="hljs-keyword">typeof</span> parts[i + <span class="hljs-number">1</span>] !== <span class="hljs-string">'function'</span>) {
+              <span class="hljs-keyword">if</span> (i + <span class="hljs-number">1</span> !== ii) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-155">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-155">&#182;</a>
+              </div>
+              <p>Next part is a string (because it’s not a function), extract
+the preceeding string (and pass it to the <code>part</code> reader) and
+skip the next part.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                index = value.indexOf(parts[++i]);
+                partValue = value.substr(<span class="hljs-number">0</span>, index);
+                value = value.substr(index + parts[i].length);
+              } <span class="hljs-keyword">else</span> {
+                partValue = value;
+              }
+              data = part(data, partValue);
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-156">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-156">&#182;</a>
+              </div>
+              <p>When the next part is not a string there is no way to tell how
+the value should be split across the two readers.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">else</span> {
+               <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unable to parse '"</span> + spec.raw + <span class="hljs-string">"', cannot separate consecutive data paths that have been concatenated together."</span>);
+            }
+            <span class="hljs-keyword">break</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-157">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-157">&#182;</a>
+              </div>
+              <p>When <code>part</code> is a string it will be at the beginning of <code>value</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">case</span> <span class="hljs-string">'string'</span>:
+            value = value.substr(part.length);
+            <span class="hljs-keyword">break</span>;
+         }
+      }
+      <span class="hljs-keyword">return</span> data;
+    }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-158">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-158">&#182;</a>
+              </div>
+              <h2 id="compilers">Compilers</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-159">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-159">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-160">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-160">&#182;</a>
+              </div>
+              <p>Compile the specified <code>basis</code> element according to the specified
+<code>directive</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  compile: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">basis, directive</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-161">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-161">&#182;</a>
+              </div>
+              <p>Each selector-directive pair in the <code>directive</code> object is compiled
+individually.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> actions = [];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> selector <span class="hljs-keyword">in</span> directive) {
+      actions.push(compiler(basis, parseSelector(selector), directive[selector]));
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-162">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-162">&#182;</a>
+              </div>
+              <p>The renderer function is the accumulation of all <code>actions</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> renderer = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element, data, index, elements, values</span>) </span>{
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> actions) {
+        actions[i](element, data, index, elements, values);
+      }
+      <span class="hljs-keyword">return</span> element;
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-163">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-163">&#182;</a>
+              </div>
+              <p>Likewise, parsing is the accumulation of all the inverse functions
+produced by <a href="#compiler"><code>compiler</code></a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    renderer.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element, data</span>) </span>{
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> actions) {
+        <span class="hljs-keyword">if</span> (actions[i].inverse) {
+          data = actions[i].inverse(element, data);
+        }
+      }
+      <span class="hljs-keyword">return</span> data;
+    };
+    <span class="hljs-keyword">return</span> renderer;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-164">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-164">&#182;</a>
+              </div>
+              <p>Auto compile inspects the class names of every descendant of the specified
+<code>element</code> and searches the specified <code>data</code> object for a matching property.
+When a matching property is found the class name is incorporated into the
+specified <code>directive</code> to produce the final renderer function.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  autoCompile: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element, directive, data</span>) </span>{
+    <span class="hljs-keyword">var</span> e, up, q = [element];
+    <span class="hljs-keyword">var</span> d, head, stack = [data];
+    <span class="hljs-keyword">var</span> classNames, specs, spec, i, ii;
+    <span class="hljs-keyword">var</span> children, els, j, jj;
+    <span class="hljs-keyword">while</span> (q.length) {
+      e = q.pop();
+      <span class="hljs-keyword">if</span> (e) {
+        <span class="hljs-keyword">if</span> (e.nodeType === <span class="hljs-number">1</span>) {
+          children = e.children;
+          <span class="hljs-keyword">if</span> (e.className) {
+            specs = [];
+            classNames = e.className.split(<span class="hljs-regexp">/ +/</span>);
+            head = stack[<span class="hljs-number">0</span>];
+            <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, ii = classNames.length; i &lt; ii; i++) {
+              <span class="hljs-keyword">if</span> (classNames[i] &amp;&amp; <span class="hljs-regexp">/^[+-]?([^\@\+]+)(\@([^\+]+))?[+-]?$/</span>.test(classNames[i])) {
+                spec = parseSelector(classNames[i]);
+                <span class="hljs-keyword">if</span> (spec.selector <span class="hljs-keyword">in</span> head) {
+                  specs.push(spec);
+                  <span class="hljs-keyword">if</span> (spec.selector !== classNames[i]) {
+                    e.className = e.className.replace(classNames[i], spec.selector);
+                  }
+                }
+              }
+            }
+            <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>, ii = specs.length; i &lt; ii; i++) {
+              spec = specs[i];
+              d = head[spec.selector];
+              <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> d === <span class="hljs-string">'object'</span>) {
+                spec.selector = <span class="hljs-string">'.'</span> + spec.selector;
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.isArray(d)) {
+                  <span class="hljs-keyword">if</span> (e.parentNode) {
+                    up = e.parentNode;
+                  } <span class="hljs-keyword">else</span> {
+                    up = <span class="hljs-built_in">document</span>.createDocumentFragment();
+                    up.appendChild(e);
+                  }
+                  els = <span class="hljs-keyword">this</span>.loopFinder(element, spec, d)(up, d, [up]);
+                  <span class="hljs-keyword">for</span> (j = <span class="hljs-number">0</span>, jj = d.length; j &lt; jj; j++) {
+                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> d[j] === <span class="hljs-string">'object'</span>) {
+                      stack.unshift(d[j]);
+                      q.push(<span class="hljs-literal">false</span>, els[j]);
+                    } <span class="hljs-keyword">else</span> {
+                      spec.selector = <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>;
+                      compiler([els[j]], spec, <span class="hljs-keyword">this</span>.stringFormatter(element, spec, d[j]))(els[j], d[j]);
+                    }
+                  }
+                } <span class="hljs-keyword">else</span> {
+                  stack.unshift(d);
+                  q.push(<span class="hljs-literal">false</span>);
+                  q.push.apply(q, children);
+                  children = [];
+                }
+              } <span class="hljs-keyword">else</span> {
+                spec.selector = <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>;
+                compiler([e], spec, <span class="hljs-keyword">this</span>.stringFormatter(element, spec, d))(e, d);
+              }
+            }
+            stack.unshift(head);
+            q.push(<span class="hljs-literal">false</span>);
+          }
+          q.push.apply(q, children);
+        }
+      } <span class="hljs-keyword">else</span> {
+        stack.shift();
+      }
+    }
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> selector <span class="hljs-keyword">in</span> directive) {
+      compiler([element], parseSelector(selector), directive[selector])(element, data);
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">return</span> element; };
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-165">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-165">&#182;</a>
+              </div>
+              <h2 id="helpers">Helpers</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-166">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-166">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-167">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-167">&#182;</a>
+              </div>
+              <p>Used when a looping directive is encountered to extract the template and
+nested directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  parseLoopSpec: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">template</span>) </span>{
+    <span class="hljs-keyword">var</span> loopSpec;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> template) <span class="hljs-keyword">if</span> (template.hasOwnProperty(key)) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-168">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-168">&#182;</a>
+              </div>
+              <p>The loopSpec takes the form of <code>lhs&lt;-rhs</code> or <code>lhs&lt;=rhs</code>.  The lefthand
+side (if present) specifies the property name that the nested directive
+uses to refer to an item in the loop and the righthand side specifies
+the property in the data object of the array to loop over.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      loopSpec = key.match(<span class="hljs-regexp">/^ *([^ ]*) *&lt;([-=]) *([^ ]*) *$/</span>);
+      <span class="hljs-keyword">if</span> (loopSpec) {
+        <span class="hljs-keyword">return</span> {
+          directive: template[key],
+          lhs: loopSpec[<span class="hljs-number">1</span>],
+          type: loopSpec[<span class="hljs-number">2</span>],
+          rhs: loopSpec[<span class="hljs-number">3</span>]
+        }; <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> ensure no other key matches /&lt;[-=]/</span>
+      }
+    }
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Expected looping directive (&lt;-) is missing."</span>);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-169">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-169">&#182;</a>
+              </div>
+              <p>Returns <code>true</code> if the first argument is an array, <code>false</code> otherwise.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isArray: <span class="hljs-built_in">Array</span>.isArray ? <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">o</span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.isArray(o); } : <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">o</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.prototype.toString.call(o) === <span class="hljs-string">"[object Array]"</span>;
+  }
+};
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">identity</span>(<span class="hljs-params">a</span>) </span>{ <span class="hljs-keyword">return</span> a; }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-170">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-170">&#182;</a>
+              </div>
+              <h1 id="utilities">Utilities</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-171">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-171">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-172">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-172">&#182;</a>
+              </div>
+              <p>Convenience function to attached an inverse function to a user defined
+formatter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Tectonic.defineInverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">fn, inverse</span>) </span>{
+  <span class="hljs-keyword">if</span> (inverse) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> inverse === <span class="hljs-string">'function'</span>) {
+      fn.inverse = inverse;
+    } <span class="hljs-keyword">else</span> {
+      fn.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(inverse); };
+    }
+  } <span class="hljs-keyword">else</span> {
+    fn.inverse = identity;
+  }
+  <span class="hljs-keyword">return</span> fn;
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-173">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-173">&#182;</a>
+              </div>
+              <p>A formatter that returns the index of an item in a loop.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Tectonic.position = Tectonic.defineInverse(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">_, _, i</span>) </span>{
+  <span class="hljs-keyword">return</span> i + <span class="hljs-number">1</span>;
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-174">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-174">&#182;</a>
+              </div>
+              <p>A formatter to add or remove the specified <code>className</code> depending on the
+truthiness of the specified <code>property</code> in the data object. A formatter may be
+specified in place of <code>property</code> in which case an <code>inverse</code> function may also
+be specified.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Tectonic.toggleClass = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">className, property, inverse</span>) </span>{
+  <span class="hljs-keyword">var</span> format, read, path;
+  <span class="hljs-keyword">if</span> (property) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> property === <span class="hljs-string">'string'</span>) {
+      path = property.split(<span class="hljs-string">'.'</span>);
+      format = Tectonic.plugin.propFormatter(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, path);
+      read = Tectonic.plugin.propReader(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, path);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> property === <span class="hljs-string">'function'</span>) {
+      format = property;
+      read = inverse || format.inverse || <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unable to parse, cannot find inverse of function."</span>); };
+    } <span class="hljs-keyword">else</span> {
+      format = Tectonic.plugin.propFormatter(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, property);
+      read = Tectonic.plugin.propReader(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, property);
+    }
+  } <span class="hljs-keyword">else</span> {
+    format = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{ <span class="hljs-keyword">return</span> data; };
+    read = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unable to parse, expected an object."</span>); }
+  }
+  <span class="hljs-keyword">return</span> Tectonic.defineInverse(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, element</span>) </span>{
+      <span class="hljs-keyword">var</span> value = format(data, element);
+      <span class="hljs-keyword">var</span> selected = value === <span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-built_in">Boolean</span>(value);
+      value = element.getAttribute(<span class="hljs-string">'class'</span>) || <span class="hljs-string">''</span>;
+      <span class="hljs-keyword">var</span> classList = value.split(<span class="hljs-regexp">/\s+/</span>);
+      <span class="hljs-keyword">var</span> index = classList.indexOf(className);
+      <span class="hljs-keyword">if</span> (index &gt;= <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">if</span> (!selected) {
+          classList.splice(index, <span class="hljs-number">1</span>);
+          value = classList.join(<span class="hljs-string">' '</span>);
+        }
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (selected) {
+        value += <span class="hljs-string">" "</span> + className;
+      }
+      <span class="hljs-keyword">return</span> value.replace(<span class="hljs-regexp">/^\s+|\s+$/g</span>, <span class="hljs-string">''</span>);
+    }
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data, value</span>) </span>{
+    <span class="hljs-keyword">var</span> classList = value.split(<span class="hljs-regexp">/\s+/</span>);
+    <span class="hljs-keyword">var</span> selected = classList.indexOf(className) &gt;= <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">return</span> read(data, selected);
+  });
+};
+
+<span class="hljs-keyword">return</span> Tectonic;
+}));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
