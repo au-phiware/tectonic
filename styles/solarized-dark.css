@@ -3,82 +3,139 @@
 Orginal Style from ethanschoonover.com/solarized (c) Jeremy Hull <sourdrums@gmail.com>
 
 */
+@media only screen and (min-width: 481px) {
+  .solarized-dark {
+    background-color: #002b36;
+  }
+}
 
+.solarized-dark
+.content {
+  background-color: #002b36;
+}
+
+.solarized-dark pre
 .hljs {
   display: block;
   overflow-x: auto;
   padding: 0.5em;
   background: #002b36;
+}
+.solarized-dark pre
+.hljs,
+.solarized-dark pre
+.hljs-tag,
+.solarized-dark pre
+.hljs-tag .hljs-title,
+.solarized-dark pre
+.hljs-rules .hljs-property,
+.solarized-dark pre
+.hljs-django .hljs-tag .hljs-keyword {
   color: #839496;
 }
 
+.solarized-dark pre
 .hljs-comment,
+.solarized-dark pre
 .hljs-quote {
   color: #586e75;
 }
 
 /* Solarized Green */
+.solarized-dark pre
 .hljs-keyword,
+.solarized-dark pre
 .hljs-selector-tag,
+.solarized-dark pre
 .hljs-addition {
   color: #859900;
 }
 
 /* Solarized Cyan */
+.solarized-dark pre
 .hljs-number,
+.solarized-dark pre
 .hljs-string,
+.solarized-dark pre
 .hljs-meta .hljs-meta-string,
+.solarized-dark pre
 .hljs-literal,
+.solarized-dark pre
 .hljs-doctag,
+.solarized-dark pre
 .hljs-regexp {
   color: #2aa198;
 }
 
 /* Solarized Blue */
+.solarized-dark pre
 .hljs-title,
+.solarized-dark pre
 .hljs-section,
+.solarized-dark pre
 .hljs-name,
+.solarized-dark pre
 .hljs-selector-id,
+.solarized-dark pre
 .hljs-selector-class {
   color: #268bd2;
 }
 
 /* Solarized Yellow */
+.solarized-dark pre
 .hljs-attribute,
+.solarized-dark pre
 .hljs-attr,
+.solarized-dark pre
 .hljs-variable,
+.solarized-dark pre
 .hljs-template-variable,
+.solarized-dark pre
 .hljs-class .hljs-title,
+.solarized-dark pre
 .hljs-type {
   color: #b58900;
 }
 
 /* Solarized Orange */
+.solarized-dark pre
 .hljs-symbol,
+.solarized-dark pre
 .hljs-bullet,
+.solarized-dark pre
 .hljs-subst,
+.solarized-dark pre
 .hljs-meta,
+.solarized-dark pre
 .hljs-meta .hljs-keyword,
+.solarized-dark pre
 .hljs-selector-attr,
+.solarized-dark pre
 .hljs-selector-pseudo,
+.solarized-dark pre
 .hljs-link {
   color: #cb4b16;
 }
 
 /* Solarized Red */
+.solarized-dark pre
 .hljs-built_in,
+.solarized-dark pre
 .hljs-deletion {
   color: #dc322f;
 }
 
+.solarized-dark pre
 .hljs-formula {
   background: #073642;
 }
 
+.solarized-dark pre
 .hljs-emphasis {
   font-style: italic;
 }
 
+.solarized-dark pre
 .hljs-strong {
   font-weight: bold;
 }

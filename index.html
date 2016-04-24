@@ -9,14 +9,30 @@
   <link rel="stylesheet"
         href="styles/solarized-dark.css" />
   <style>
-    body.solarized-dark {
-      background-color: #002b36;
-    }
     .badge {
       vertical-align: text-bottom;
     }
-    pre code.hljs {
+    .highlight pre code.hljs {
       padding: 0;
+    }
+    .highlight {
+      padding-top: 1.5em;
+    }
+    .highlight:first-child {
+      padding-top: 0;
+    }
+    .gh-ribbon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 149px;
+      height: 149px;
+      z-index:2;
+    }
+    @media only screen and (min-width: 481px) {
+      .gh-ribbon {
+        position: fixed;
+      }
     }
   </style>
   <script src="highlight.pack.js"></script>
@@ -24,9 +40,8 @@
 </head>
 <body class="solarized-dark">
   <a href="https://github.com/tecknack/tectonic">
-    <img
-     src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"
-     style="position:fixed; top:0;right:0; width:149px; height:149px;z-index:2">
+    <img class="gh-ribbon"
+     src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png">
   </a>
   <div id="container">
     <div id="background"></div>
@@ -128,18 +143,291 @@
             <a class="pilcrow" href="#examples">&#182;</a>
           </div>
           <h1>Examples</h1>
+          <h2>Basics</h2>
+          <p>Without any plugins, all functionality is accessible from the
+          <code>Tectonic</code> object.</p>
         </div>
       </li>
 
-      <li id="example-10">
+      <li id="example-1">
         <div class="annotation">
           <div class="pilwrap">
-          <a class="pilcrow" href="#example-10">&#182;</a>
+            <a class="pilcrow" href="#example-1">&#182;</a>
           </div>
-          <p></p>
+          <p>The simplest usage is <code>autoRender</code>. Here we have a HTML
+          snippet; the class name has been carefully chosen to match a property
+          in our data.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="javascript"></code></pre>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-1'))
+.autoRender(
+  {
+    'hello': 'Hello, World!'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-1">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-1">&#182;</a>
+          </div>
+          <p>This results in the value from our data subsituted in the chosen
+          DOM node.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hello, World!&lt;/span&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-2">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-2">&#182;</a>
+          </div>
+          <p>That's all very well and good but <code>autoRender</code> is not
+          very flexible (not to mention inefficient). Here we have the same HTML
+          snippet; but instead of our data needing to match the DOM, we pass a
+          directive with the data to <code>render</code> in order to do the
+          equivalent matching.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-2'))
+.render(
+  {
+    'message': 'Hello, World!'
+  },
+  {
+    '.hello': 'message'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-2">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-2">&#182;</a>
+          </div>
+          <p>The result is the same.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hello, World!&lt;/span&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-3">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-3">&#182;</a>
+          </div>
+          <p>Directives can also be precompiled. Again here's the same example
+          but first we <code>compile</code> our directive.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>var t = new Tectonic(document.getElementById('example-3'));
+var template = t.compile(
+  {
+    '.hello': 'message'
+  }
+);
+t.render(
+  {
+    'message': 'Hello, World!'
+  },
+  template
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-3">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-3">&#182;</a>
+          </div>
+          <p>No surprises here.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hello, World!&lt;/span&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-4">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-4">&#182;</a>
+          </div>
+          <p>The precompiled template can also be used independently.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>var t = new Tectonic(document.getElementById('example-4'));
+var template = t.compile(
+  {
+    '.hello': 'message'
+  }
+);
+template.render(
+  {
+    'message': 'Hello, World!'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-4">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-4">&#182;</a>
+          </div>
+          <p>But this time it returns a new node, detached from the DOM!
+          It's up to you to do what you want with it.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-5">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-5">&#182;</a>
+          </div>
+          <p>We've seen how to put data into the DOM for the simplest use case,
+          but Tectonic can also get data out of the DOM too. Note that this is
+          entirely independent from <code>render</code>, we are not using any
+          tricks like storing data in the DOM during rendering.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-5'))
+.parse(
+  {
+    '.hello': 'message'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-5">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-5">&#182;</a>
+          </div>
+          <p>The return value from <code>parse</code> is a plain old object.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="json"
+>{
+  "message": "Hi there!"
+}</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-6">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-6">&#182;</a>
+          </div>
+          <p>We can use <code>parse</code> with precompiled templates too.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>var t = new Tectonic(document.getElementById('example-6'));
+var template = t.compile(
+  {
+    '.hello': 'message'
+  }
+);
+t.parse(template);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-6">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-6">&#182;</a>
+          </div>
+          <p>The return value is the same.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="json"
+>{
+  "message": "Hi there!"
+}</code></pre>
+        </div></div>
+      </li>
+
+      <li id="example-7">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-7">&#182;</a>
+          </div>
+          <p>The trick here is that <code>compile</code> exports an inverse
+          function on its returned function.</p>
+          <p>Here we also use <code>get</code> to return the original DOM node
+          that was given to Tectonic.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>var t = new Tectonic(document.getElementById('example-7'));
+var template = t.compile(
+  {
+    '.hello': 'message'
+  }
+);
+template.inverse(t.get());</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-7">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-7">&#182;</a>
+          </div>
+          <p>Again, the return value is the same.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="json"
+>{
+  "message": "Hi there!"
+}</code></pre>
         </div></div>
       </li>
 
