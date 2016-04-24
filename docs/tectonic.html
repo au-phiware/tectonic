@@ -550,8 +550,8 @@ For example you can produce many nodes like so</p>
     <span class="hljs-keyword">var</span> bounded = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
       <span class="hljs-keyword">return</span> renderer(tectonic.equals(<span class="hljs-keyword">this</span>) ? element : basis.cloneNode(<span class="hljs-literal">true</span>), data);
     };
-    bounded.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">return</span> renderer.inverse(tectonic.equals(<span class="hljs-keyword">this</span>) ? element : basis, {});
+    bounded.inverse = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">el</span>) </span>{
+      <span class="hljs-keyword">return</span> renderer.inverse(tectonic.equals(<span class="hljs-keyword">this</span>) ? element : el || basis, {});
     };
     <span class="hljs-keyword">return</span> bounded;
   };</pre></div></div>

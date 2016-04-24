@@ -1,9 +1,8 @@
 jasmine.getFixtures().fixturesPath = '/base/spec/javascripts/fixtures';
 
-function render(expected, element, data, directive) {
+function render(expected, element, data, directive, expect) {
   var t = new Tectonic(element);
-  expect(t.render(data, directive).get().outerHTML)
-      .toEqual(expected.outerHTML);
+  expect(t.render(data, directive).get());
   return t;
 }
 
@@ -15,9 +14,8 @@ render.inverse = function(expected, element, directive) {
   }
 }
 
-function autoRender(expected, element, data, directive) {
-  expect(new Tectonic(element).autoRender(data, directive).get().outerHTML)
-      .toEqual(expected.outerHTML);
+function autoRender(expected, element, data, directive, expect) {
+  expect(new Tectonic(element).autoRender(data, directive).get());
 }
 
 var fixtures = [
@@ -50,6 +48,27 @@ var fixtures = [
     fixture:    fromString('<div><span>Hello</span></div>'),
     expected:   fromString('<div><span>Hello, World</span></div>'),
     exec:       render
+  },
+  {
+    name:       'render precompiled directive',
+    fixture:    fromString('<div><span class="hello">Hello</span></div>'),
+    expected:   fromString('<div><span class="hello">Hello, World</span></div>'),
+    directive:  {".hello": "hello"},
+    data:       {"hello": "Hello, World"},
+    exec: function(expected, element, data, directive, expect) {
+      var tectonic = new Tectonic(element.cloneNode(true));
+      var template = tectonic.compile(directive);
+      expect(tectonic.render(data, template).get());
+      return element;
+    },
+    inverse: function(data, element, directive) {
+      var tectonic = new Tectonic(element);
+      var template = tectonic.compile(directive);
+      tectonic.render(data, template);
+      expect(tectonic.parse(template)).toEqual(data);
+      expect(template.inverse()).toEqual({"hello": "Hello"});
+      expect(template.inverse(element)).toEqual(data);
+    }
   },
   {
     name:       "renders to attribute value",
@@ -302,9 +321,13 @@ var fixtures = [
     fixture:    fromString('<div><div class="thing">Hello, <span></span>.</div></div>'),
     expected:   fromString('<div><div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div><div class="thing">Hello, <span>World</span>.</div></div><div><div class="thing">Hello, <span>World</span>.</div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div></div></div>'),
     exec: function(expected, element, data, directive) {
-      render(expected.children[0], element, data, directive);
+      render(expected.children[0], element, data, directive, expect, function(actual) {
+        expect(actual.outerHTML).toEqual(expected.children[0].outerHTML);
+      });
       delete directive[".thing"].sort;
-      render(expected.children[1], element, data, directive);
+      render(expected.children[1], element, data, directive, expect, function(actual) {
+        expect(actual.outerHTML).toEqual(expected.children[1].outerHTML);
+      });
     }
   },
   {
@@ -406,8 +429,8 @@ var fixtures = [
     },
     fixture:    fromString('<form><input class="with-elem"/><input class="with-attr@value"/><input class="append:after" value="A"/><input class="prepend:before" value="B"/></form>'),
     expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
-    exec:       function(expected, element, data, directive) {
-      var t = render(expected, element, data, directive);
+    exec:       function(expected, element, data, directive, _) {
+      var t = render(expected, element, data, directive, _);
       expect(element.children.item(0).value).toEqual('E');
       expect(element.children.item(1).value).toEqual('A');
       expect(element.children.item(2).value).toEqual('AB');
@@ -423,8 +446,8 @@ var fixtures = [
     },
     fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append:after">A</textarea><textarea class="prepend:before">B</textarea></form>'),
     expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
-    exec:       function(expected, element, data, directive) {
-      var t = render(expected, element, data, directive);
+    exec:       function(expected, element, data, directive, _) {
+      var t = render(expected, element, data, directive, _);
       expect(element.children.item(0).value).toEqual('E');
       expect(element.children.item(1).value).toEqual('AB');
       expect(element.children.item(2).value).toEqual('AB');
@@ -446,8 +469,8 @@ var fixtures = [
     },
     fixture:    fromString('<form><input class="with-elem"/><input class="with-attr"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
     expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
-    exec:       function(expected, element, data, directive) {
-      var t = render(expected, element, data, directive);
+    exec:       function(expected, element, data, directive, _) {
+      var t = render(expected, element, data, directive, _);
       expect(element.children.item(0).value).toEqual('E');
       expect(element.children.item(1).value).toEqual('A');
       expect(element.children.item(2).value).toEqual('AB');
@@ -470,8 +493,8 @@ var fixtures = [
     },
     fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
     expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
-    exec:       function(expected, element, data, directive) {
-      var t = render(expected, element, data, directive);
+    exec:       function(expected, element, data, directive, _) {
+      var t = render(expected, element, data, directive, _);
       expect(element.children.item(0).value).toEqual('E');
       expect(element.children.item(1).value).toEqual('AB');
       expect(element.children.item(2).value).toEqual('AB');
@@ -594,9 +617,9 @@ var fixtures = [
     data:       { "k": "v" },
     fixture:    fromString('<b class="k"> </b>'),
     expected:   fromString('<b class="k">v</b>'),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       element = element.parentNode.removeChild(element);
-      autoRender(expected, element, data, directive);
+      autoRender(expected, element, data, directive, expect);
     }
   },
   {
@@ -605,9 +628,9 @@ var fixtures = [
     directive:  { "b": "k" },
     fixture:    fromString('<div><b> </b></div>'),
     expected:   fromString('<div><b>v</b></div>'),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       element = element.parentNode.removeChild(element);
-      render(expected, element, data, directive);
+      render(expected, element, data, directive, expect);
     }
   },
   {
@@ -616,9 +639,9 @@ var fixtures = [
     directive:  { "b": "k" },
     fixture:    fromString('<a><b> </b></a>'),
     expected:   fromString('<a><b>v</b></a>'),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       element = element.parentNode.removeChild(element);
-      render(expected, element, data, new Tectonic(element).compile(directive));
+      render(expected, element, data, new Tectonic(element).compile(directive), expect);
     }
   },
   {
@@ -631,9 +654,9 @@ var fixtures = [
     },
     fixture:    fromString('<b class="pet"></b>'),
     expected:   fromString('<b class="pet">Cat</b><b class="pet">Dog</b>'),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       element = element.parentNode.removeChild(element);
-      autoRender(expected, element, data, directive);
+      autoRender(expected, element, data, directive, expect);
     }
   },
   {
@@ -692,14 +715,12 @@ var fixtures = [
     ],
     fixture:    fromFile("double-renders", 0),
     expected:   fromFile("double-renders", 1),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       expect(new Tectonic(
             new Tectonic(element)
             .render(data, directive[0]))
           .render(data, directive[1])
-          .get()
-          .outerHTML)
-        .toEqual(expected.outerHTML);
+          .get());
     }
   },
   {
@@ -767,7 +788,7 @@ var fixtures = [
     },
     fixture:    fromFile("renders-recursively", 0),
     expected:   fromFile("renders-recursively", 1),
-    exec: function(expected, element, data) {
+    exec: function(expected, element, data, _, expect) {
       var tectonic = new Tectonic(element);
       var directive = tectonic.compile({
         "li": {
@@ -782,9 +803,7 @@ var fixtures = [
       });
       expect(new Tectonic(element)
           .render(data, directive)
-          .get()
-          .outerHTML)
-        .toEqual(expected.outerHTML);
+          .get());
     }
   },
   {
@@ -792,16 +811,14 @@ var fixtures = [
     directive: {span: "i"},
     fixture:   fromString('<div><span> </span></div>'),
     expected:  fromString('<div><span>2</span></div>'),
-    exec: function(expected, element, _, directive) {
+    exec: function(expected, element, _, directive, expect) {
       element = new Tectonic(element);
       var renderer = element.compile(directive);
       expect(element
           .render({i: 0}, renderer)
           .render({i: 1}, renderer)
           .render({i: 2}, renderer)
-          .get()
-          .outerHTML)
-        .toEqual(expected.outerHTML);
+          .get());
     }
   },
   {
@@ -809,16 +826,14 @@ var fixtures = [
     directive:  {span: {'i<-list':{'.':'i'}}},
     fixture:   fromString('<div><span> </span></div>'),
     expected:  fromString('<div><span>2</span></div>'),
-    exec: function(expected, element, data, directive) {
+    exec: function(expected, element, data, directive, expect) {
       element = new Tectonic(element);
       directive = element.compile(directive);
       expect(new Tectonic(element)
           .render({list: [0,1]}, directive)
           .render({list: [   ]}, directive)
           .render({list: [ 2 ]}, directive)
-          .get()
-          .outerHTML)
-        .toEqual(expected.outerHTML);
+          .get());
     }
   },
   {
@@ -949,7 +964,9 @@ function runner(fixture) {
         failed("Nothing expected?");
       }
     } else {
-      fixture.exec(expected, element, fixture.data, fixture.directive);
+      fixture.exec(expected, element, fixture.data, fixture.directive, function(actual) {
+        expect(actual.outerHTML).toEqual(expected.outerHTML);
+      });
     }
   }
 }
@@ -966,7 +983,7 @@ runner.inverse = function(fixture) {
         failed("Nothing expected?");
       }
     } else {
-      (fixture.inverse || fixture.exec.inverse)(data, fixture.exec(expected, element, fixture.data, fixture.directive), fixture.directive);
+      (fixture.inverse || fixture.exec.inverse)(data, fixture.exec(expected, element, fixture.data, fixture.directive, function() {}), fixture.directive);
     }
   }
 }
