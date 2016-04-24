@@ -186,8 +186,8 @@ function Tectonic(element, basis) {
     var bounded = function(data) {
       return renderer(tectonic.equals(this) ? element : basis.cloneNode(true), data);
     };
-    bounded.inverse = function() {
-      return renderer.inverse(tectonic.equals(this) ? element : basis, {});
+    bounded.inverse = function(el) {
+      return renderer.inverse(tectonic.equals(this) ? element : el || basis, {});
     };
     return bounded;
   };
