@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/au-phiware/tectonic.git"
+    "url": "git+https://github.com/tecknack/tectonic.git"
   },
   "keywords": [
     "unobtrusive",
@@ -22,9 +22,9 @@
   "author": "Corin Lawson <corin@phiware.com.au>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/au-phiware/tectonic/issues"
+    "url": "https://github.com/tecknack/tectonic/issues"
   },
-  "homepage": "https://github.com/au-phiware/tectonic#readme",
+  "homepage": "http://tecknack.github.io/tectonic",
   "devDependencies": {
     "docco": "^0.7.0",
     "dom-compare": "^0.2.1",
