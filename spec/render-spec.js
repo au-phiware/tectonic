@@ -1,4 +1,8 @@
-jasmine.getFixtures().fixturesPath = '/base/spec/javascripts/fixtures';
+if (/^http:\/\/tecknack\.github\.io\/tectonic\//.test(location)) {
+  jasmine.getFixtures().fixturesPath = '/tectonic/spec/javascripts/fixtures';
+} else {
+  jasmine.getFixtures().fixturesPath = '/base/spec/javascripts/fixtures';
+}
 
 function render(expected, element, data, directive, expect) {
   var t = new Tectonic(element);
