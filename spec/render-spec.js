@@ -62,7 +62,7 @@ var fixtures = [
   {
     name:       "appends to attribute value",
     data:       {"hello": " World"},
-    directive:  {"span@title+": "hello"},
+    directive:  {"span@title:after": "hello"},
     fixture:    fromString('<div><span title="Hello">Hello</span></div>'),
     expected:   fromString('<div><span title="Hello World">Hello</span></div>'),
     exec:       render
@@ -70,7 +70,7 @@ var fixtures = [
   {
     name:       "prepends to attribute value",
     data:       {"hello": "Hello "},
-    directive:  {"+span@title": "hello"},
+    directive:  {"span@title:before": "hello"},
     fixture:    fromString('<div><span title="World">Hello</span></div>'),
     expected:   fromString('<div><span title="Hello World">Hello</span></div>'),
     exec:       render
@@ -181,7 +181,7 @@ var fixtures = [
     directive:  {
       ".who": "who2.name",
       ".who@title": "\"See the tweets of \"who2.twitter",
-      ".who@href+": "who2.twitter"
+      ".who@href:after": "who2.twitter"
     },
     fixture:    fromFile("auto-renders-loop-with-directive", 0),
     expected:   fromFile("auto-renders-loop-with-directive", 1),
@@ -341,8 +341,8 @@ var fixtures = [
     name:       "renders class attribute",
     data:       { "class": "on" },
     directive:  {
-      ".append@class+": 'class',
-      "+.prepend@class": 'class'
+      ".append@class:after": 'class',
+      ".prepend@class:before": 'class'
     },
     fixture:    fromString('<a><b class="append"></b><b class="prepend"></b></a>'),
     expected:   fromString('<a><b class="append on"></b><b class="on prepend"></b></a>'),
@@ -352,16 +352,15 @@ var fixtures = [
     name:       "renders class attribute with toggle",
     data:       { "class": "on" },
     directive:  {
-      "-.toggle@class+": 'class',
-      "+ .pretoggle@class -": 'class'
+      ".toggle@class:toggle": 'class'
     },
-    fixture:    fromString('<a><b class="toggle"></b><b class="toggle on"></b><b class="pretoggle"></b></a>'),
-    expected:   fromString('<a><b class="toggle on"></b><b class="toggle"></b><b class="on pretoggle"></b></a>'),
+    fixture:    fromString('<a><b class="toggle"></b><b class="toggle on"></b></a>'),
+    expected:   fromString('<a><b class="toggle on"></b><b class="toggle"></b></a>'),
     exec:       render,
     inverse:    function(_, element, directive) {
       expect(function() {
         element.parse(directive);
-      }).toThrow(new Error("Unable to parse '-.toggle@class+', cannot determine value of toggle."));
+      }).toThrow(new Error("Unable to parse '.toggle@class:toggle', cannot determine value of toggle."));
     }
   },
   {
@@ -405,7 +404,7 @@ var fixtures = [
       "append": "B",
       "prepend": "A"
     },
-    fixture:    fromString('<form><input class="with-elem"/><input class="with-attr@value"/><input class="append+" value="A"/><input class="+prepend" value="B"/></form>'),
+    fixture:    fromString('<form><input class="with-elem"/><input class="with-attr@value"/><input class="append:after" value="A"/><input class="prepend:before" value="B"/></form>'),
     expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
     exec:       function(expected, element, data, directive) {
       var t = render(expected, element, data, directive);
@@ -422,7 +421,7 @@ var fixtures = [
       "append": "B",
       "prepend": "A"
     },
-    fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append+">A</textarea><textarea class="+prepend">B</textarea></form>'),
+    fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append:after">A</textarea><textarea class="prepend:before">B</textarea></form>'),
     expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
     exec:       function(expected, element, data, directive) {
       var t = render(expected, element, data, directive);
@@ -442,8 +441,8 @@ var fixtures = [
     directive: {
       ".with-elem": "with-elem",
       ".with-attr@value": "with-attr",
-      ".append+": "append",
-      "+.prepend": "prepend"
+      ".append:after": "append",
+      ".prepend:before": "prepend"
     },
     fixture:    fromString('<form><input class="with-elem"/><input class="with-attr"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
     expected:   fromString('<form><input class="with-elem"/><input class="with-attr" value="A"/><input class="append" value="A"/><input class="prepend" value="B"/></form>'),
@@ -466,8 +465,8 @@ var fixtures = [
     },
     directive: {
       ".with-elem": "with-elem",
-      ".append+": "append",
-      "+.prepend": "prepend"
+      ".append:after": "append",
+      ".prepend:before": "prepend"
     },
     fixture:    fromString('<form><textarea class="with-elem"></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
     expected:   fromString('<form><textarea class="with-elem"></textarea></textarea><textarea class="append">A</textarea><textarea class="prepend">B</textarea></form>'),
@@ -494,7 +493,7 @@ var fixtures = [
     directive:  {
       "label": {
         "pet<-pets": {
-          ".+": "pet.name",
+          ".:after": "pet.name",
           "input": "pet.val",
           "input@checked": "pet.owns"
         }
@@ -553,7 +552,7 @@ var fixtures = [
   {
     name:       "appends to a comment",
     data:       { "text": ", any non-element node can be appended to." },
-    directive:  { ".+": "text" },
+    directive:  { ".:after": "text" },
     fixture:    function () { return document.createTextNode("Yup"); },
     expected:   function () { return document.createTextNode("Yup, any non-element node can be appended to."); },
     exec:       render
@@ -561,7 +560,7 @@ var fixtures = [
   {
     name:       "prepends to a comment",
     data:       { "text": "OR " },
-    directive:  { "+.": "text" },
+    directive:  { ".:before": "text" },
     fixture:    function () { return document.createTextNode("any non-element node can be prepended to."); },
     expected:   function () { return document.createTextNode("OR any non-element node can be prepended to."); },
     exec:       render
@@ -577,7 +576,7 @@ var fixtures = [
   {
     name:       "appends to a processing instruction",
     data:       { "progid": '"Excel.Document"' },
-    directive:  { "@data+": "progid" },
+    directive:  { "@data:after": "progid" },
     fixture:    function () { return document.createProcessingInstruction("mso-application", 'progid='); },
     expected:   function () { return document.createProcessingInstruction("mso-application", 'progid="Excel.Document"'); },
     exec:       render
@@ -585,7 +584,7 @@ var fixtures = [
   {
     name:       "prepends to a processing instruction",
     data:       { "attrs": 'media="print"' },
-    directive:  { "+@data": "attrs ' '" },
+    directive:  { "@data:before": "attrs ' '" },
     fixture:    function () { return document.createProcessingInstruction("xml-stylesheet", 'href="print.css" type="text/css"'); },
     expected:   function () { return document.createProcessingInstruction("xml-stylesheet", 'media="print" href="print.css" type="text/css"'); },
     exec:       render
@@ -928,8 +927,8 @@ var fixtures = [
     directive:  {
       "tt": {
         "team<-teams": {
-          "+.": "team",
-          ".+": Tectonic.position
+          ":before": "team",
+          ":after": Tectonic.position
         }
       }
     },

@@ -41,7 +41,7 @@
 // [Beebole's PURE](https://github.com/pure/pure) rendering engine.
 // It ascribes to PURE's unobtusive philosophy, whereby HTML code is completely
 // free of any application logic or new syntax and JavaScript code is
-// uninhibited by presentational concerns. This achieved by both PURE and
+// uninhibited by presentational concerns. This is achieved by both PURE and
 // Tectonic by the use of a directive object that marries HTML referenced by CSS
 // selectors to properties in your application's data.
 // Where Tectonic departs from PURE is in the use of functions, known as
@@ -213,28 +213,26 @@ function Tectonic(element, basis) {
 // four optional parts.
 function parseSelector(str) {
   var spec = { raw: str };
-  var match = str.match(/^([+-])? *([^\@\+]+)? *(\@([^ ]+?))? *([+-])?$/);
+  var match = str.match(/^ *([^@]*?)?? *(\@([^ ]+?))? *(:(before|after|toggle))? *$/);
 
   if (!match)
     throw new Error("invalid selector: '" + str + "'");
 
-  // The first part may be a `+`, signifying that content must be prepended, or
-  // `-`, signifying that content should be shifted off from the front.
-  spec.prepend  = match[1] === '+';
-  spec.shift    = match[1] === '-';
-  // The second part specifies a (CSS) selector used to find the element to be
+  // The first part specifies a (CSS) selector used to find the element to be
   // updated.
-  spec.selector = match[2];
-  // The third, if present, must be preceeded by an `@`, and names the attribute
-  // of the element to be updated.
-  spec.attr     = match[4];
-  // The fourth, may be a `+`, signifying that content must be appended, or
-  // `-`, signifying that content should be popped off from the end.
-  spec.append   = match[5] === '+';
-  spec.pop      = match[5] === '-';
-  // If both first and fourth parts are present and opposing, the that signifies
-  // that the content must be switch between two alternative values.
-  spec.toggle   = spec.prepend && spec.pop || spec.shift && spec.append;
+  spec.selector = match[1];
+  // The next part, if present, must be preceeded by an `@`, and names the
+  // attribute of the element to be updated.
+  spec.attr     = match[3];
+  // The last part, is like a pseudo-class selector, but in this case it
+  // signifies that the content should be prepended (before) or appended
+  // (after). Note that it doesn't make sense for tectonic is manipulate
+  // pseudo-classes.
+  spec.prepend  = match[5] === 'before';
+  spec.append   = match[5] === 'after';
+  // A special pseudo-class, just for Tectonic, the that signifies that the
+  // content must be switched between two alternative values.
+  spec.toggle   = match[5] === 'toggle';
 
   return spec;
 }
@@ -557,10 +555,8 @@ Tectonic.plugin = {
             var classList = ' ' + target.getAttribute('class') + ' ';
             if (classList.indexOf(' ' + value + ' ') >= 0) {
               classList = classList.replace(' ' + value + ' ', ' ');
-            } else if (spec.append) {
-              classList += value;
             } else {
-              classList = value + classList;
+              classList += value;
             }
             value = classList.replace(/^ +| +$/g, '');
           } else if (spec.append) {
