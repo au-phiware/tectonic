@@ -31,9 +31,49 @@
       height: 149px;
       z-index:2;
     }
+    .content {
+      clear: both;
+    }
+    .example {
+      border-top: 1.5px solid rgba(131, 148, 150, 0.6);
+      margin-top: 2em;
+    }
+    .example > :first-child {
+      display: block;
+      margin-top: -14px;
+      margin-bottom: -0.5em;
+    }
+    .example > :first-child span {
+      color: #839496;
+      background: #ffffff;
+      padding: 0 3px;
+      margin-left: -3px;
+    }
     @media only screen and (min-width: 481px) {
+      .example {
+        margin-top: 0;
+      }
+      .example > :first-child {
+        display: block;
+        margin-top: -17px;
+        margin-bottom: 0;
+      }
+      .example > :first-child span {
+        color: #839496;
+        background: #002b36;
+        padding: 0 3px;
+        margin-left: 362px;
+      }
+    }
+    @media only screen and (min-width: 1025px) {
       .gh-ribbon {
         position: fixed;
+      }
+      .example > :first-child {
+        margin-top: -18px;
+      }
+      .example > :first-child span {
+        margin-left: 550px;
       }
     }
   </style>
@@ -178,7 +218,8 @@
         </div>
       </li>
 
-      <li id="example-1">
+      <li id="example-1" class="example">
+        <div><span>Example 1</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-1">&#182;</a>
@@ -216,7 +257,8 @@
         </div></div>
       </li>
 
-      <li id="example-2">
+      <li id="example-2" class="example">
+        <div><span>Example 2</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-2">&#182;</a>
@@ -258,7 +300,8 @@
         </div></div>
       </li>
 
-      <li id="example-3">
+      <li id="example-3" class="example">
+        <div><span>Example 3</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-3">&#182;</a>
@@ -300,7 +343,8 @@ t.render(
         </div></div>
       </li>
 
-      <li id="example-4">
+      <li id="example-4" class="example">
+        <div><span>Example 4</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-4">&#182;</a>
@@ -341,7 +385,8 @@ template.render(
         </div></div>
       </li>
 
-      <li id="example-5">
+      <li id="example-5" class="example">
+        <div><span>Example 5</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-5">&#182;</a>
@@ -381,7 +426,8 @@ template.render(
         </div></div>
       </li>
 
-      <li id="example-6">
+      <li id="example-6" class="example">
+        <div><span>Example 6</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-6">&#182;</a>
@@ -419,7 +465,8 @@ t.parse(template);</code></pre>
         </div></div>
       </li>
 
-      <li id="example-7">
+      <li id="example-7" class="example">
+        <div><span>Example 7</span></div>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-7">&#182;</a>
