@@ -552,7 +552,7 @@ Tectonic.plugin = {
         // Treat class attribute (and aliases) specially.
         else if (spec.attr === "class" || spec.attr === "className" || spec.attr === "classList") {
           if (spec.toggle) {
-            var classList = ' ' + target.getAttribute('class') + ' ';
+            var classList = ' ' + (target.getAttribute('class') || '') + ' ';
             if (classList.indexOf(' ' + value + ' ') >= 0) {
               classList = classList.replace(' ' + value + ' ', ' ');
             } else {

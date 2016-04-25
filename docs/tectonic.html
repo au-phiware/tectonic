@@ -1631,7 +1631,7 @@ replaced with the returned node.</p>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (spec.attr === <span class="hljs-string">"class"</span> || spec.attr === <span class="hljs-string">"className"</span> || spec.attr === <span class="hljs-string">"classList"</span>) {
           <span class="hljs-keyword">if</span> (spec.toggle) {
-            <span class="hljs-keyword">var</span> classList = <span class="hljs-string">' '</span> + target.getAttribute(<span class="hljs-string">'class'</span>) + <span class="hljs-string">' '</span>;
+            <span class="hljs-keyword">var</span> classList = <span class="hljs-string">' '</span> + (target.getAttribute(<span class="hljs-string">'class'</span>) || <span class="hljs-string">''</span>) + <span class="hljs-string">' '</span>;
             <span class="hljs-keyword">if</span> (classList.indexOf(<span class="hljs-string">' '</span> + value + <span class="hljs-string">' '</span>) &gt;= <span class="hljs-number">0</span>) {
               classList = classList.replace(<span class="hljs-string">' '</span> + value + <span class="hljs-string">' '</span>, <span class="hljs-string">' '</span>);
             } <span class="hljs-keyword">else</span> {

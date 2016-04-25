@@ -379,15 +379,15 @@ var fixtures = [
     name:       "renders class attribute with toggle",
     data:       { "class": "on" },
     directive:  {
-      ".toggle@class:toggle": 'class'
+      "b@class:toggle": 'class'
     },
-    fixture:    fromString('<a><b class="toggle"></b><b class="toggle on"></b></a>'),
-    expected:   fromString('<a><b class="toggle on"></b><b class="toggle"></b></a>'),
+    fixture:    fromString('<a><b class="toggle"></b><b class="toggle on"></b><b></b><b class="on"></b></a>'),
+    expected:   fromString('<a><b class="toggle on"></b><b class="toggle"></b><b class="on"></b><b class=""></b></a>'),
     exec:       render,
     inverse:    function(_, element, directive) {
       expect(function() {
         element.parse(directive);
-      }).toThrow(new Error("Unable to parse '.toggle@class:toggle', cannot determine value of toggle."));
+      }).toThrow(new Error("Unable to parse 'b@class:toggle', cannot determine value of toggle."));
     }
   },
   {
