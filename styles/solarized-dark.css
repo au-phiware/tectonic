@@ -120,6 +120,8 @@ code {
 
 /* Solarized Red */
 .solarized-dark pre
+.hljs-params,
+.solarized-dark pre
 .hljs-built_in,
 .solarized-dark pre
 .hljs-deletion {

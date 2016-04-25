@@ -50,6 +50,9 @@
       padding-top: 1em;
       margin-left: 10px;
     }
+    .devtools {
+      visibility: hidden;
+    }
     .devtools * {
       display: none;
     }
@@ -526,6 +529,1052 @@ template.inverse(t.get());</code></pre>
 >{
   "message": "Hi there!"
 }</code></pre>
+        </div></div>
+      </li>
+
+      <li id="selectors">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#selectors">&#182;</a>
+          </div>
+          <h2>Selectors</h2>
+          <p>As you've already seen a directive is a plain old object that
+          tells Tectonic where to find the data (the object's values) and where
+          to put it in the DOM (the object's key). The following examples
+          explores the latter, that is the directive's selectors.</p>
+        </div>
+      </li>
+
+      <div id="example-8" class="devtools">
+        <p></p>
+        <p class="msg"></p>
+        <p data-msg="example"></p>
+        <p></p>
+      </div>
+      <li class="example">
+        <div><span>Example 8</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-8">&#182;</a>
+          </div>
+          <p>As you've already guessed, the selector of a directive can be any
+          valid selector accepted by
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"><code>querySelector</code></a>.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-8'))
+.render(
+  {
+    'element': 'Element matched by name.',
+    'class': 'Element matched by class name.',
+    'attribute': 'Element matched by attribute.',
+    'pseudo-class': 'Element matched by pseudo-class'
+  },
+  {
+    'p': 'element',
+    '.msg': 'class',
+    '[data-msg]': 'attribute',
+    ':last-child': 'pseudo-class'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-8">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-8">&#182;</a>
+          </div>
+          <p>But don't be fooled the selectors are <em>not</em> CSS selectors.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;p&gt;Element matched by name.&lt;/p&gt;
+&lt;p class="msg"&gt;Element matched by class name.&lt;/p&gt;
+&lt;p data-msg="example"&gt;Element matched by attribute.&lt;/p&gt;
+&lt;p&gt;Element matched by pseudo-class&lt;/p&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-9" class="devtools">
+        <p class="background">Let's get solarized!</p>
+      </div>
+      <li class="example">
+        <div><span>Example 9</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-9">&#182;</a>
+          </div>
+          <p>Tectonic allows you to update attributes in the DOM by using a
+          special <code>@attribute</code> syntax.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-9'))
+.render(
+  {
+    'theme': 'solarized-dark'
+  },
+  {
+    'p@class': 'theme'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-9">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-9">&#182;</a>
+          </div>
+          <p>The attribute value is replaced.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+            >&lt;p class="solarized-dark"&gt;Let's get solarized!&lt;/p&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-10" class="devtools">
+        <p class="background">Let's get </p>
+      </div>
+      <li class="example">
+        <div><span>Example 10</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-10">&#182;</a>
+          </div>
+          <p>Replacing values isn't always what you want, so Tectonic interprets
+          the pseudo-classes <code>:before</code> and <code>:after</code>
+          differently.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-10'))
+.render(
+  {
+    'theme': 'solarized-dark',
+    'name': 'Solarized (Dark)'
+  },
+  {
+    'p@class:before': 'theme',
+    'p:after': 'name'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-10">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-10">&#182;</a>
+          </div>
+          <p>This time the original attribute value is retain and added to.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+            >&lt;p class="solarized-dark background"&gt;Let's get Solarized (Dark)&lt;/p&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-11" class="devtools">
+        <p class="solarized-dark">I'm solarized</p>
+        <p>I'm not</p>
+      </div>
+      <li class="example">
+        <div><span>Example 11</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-11">&#182;</a>
+          </div>
+          <p>There's an extra pseudo-class, <code>:toggle</code>.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-11'))
+.render(
+  {
+    'theme': 'solarized-dark',
+    'message': "No you're not, I am"
+  },
+  {
+    'p@class:toggle': 'theme',
+    ':last-child': 'message'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-11">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-11">&#182;</a>
+          </div>
+          <p>If the class was already there, it gets removed, otherwise it gets
+          added.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;p class=""&gt;I'm solarized&lt;/p&gt;
+&lt;p class="solarized-dark"&gt;No you're not, I am&lt;/p&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-12" class="devtools">
+        <input type="text" name="version">
+        <input type="checkbox" name="published">
+        <select name="branch">
+          <option value="gh-pages">github.io</option>
+          <option value="master">master</option>
+        </select>
+      </div>
+      <li class="example">
+        <div><span>Example 12</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-12">&#182;</a>
+          </div>
+          <p>Input elements and dropdown boxes are treated specially. Since all
+          input elements should be empty, Tectonic updates the
+          <code>value</code> property instead of its contents. Remember to use
+          <code>@checked</code> for checkbox and radio input fields. Similarly,
+          <code>@selected</code> should be used with <code>option</code>
+          elements.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-12'))
+.render(
+  {
+    'latest': '0.1.2',
+    'ready': 1,
+    'isMaster': 1
+  },
+  {
+    '[name="version"]': 'latest',
+    '[name="published"]@checked': 'ready',
+    '[value="master"]@selected': 'isMaster'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-12">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-12">&#182;</a>
+          </div>
+          <p>Notice that the input element doesn't receive a value attribute,
+          this is because only the value <em>property</em> of the DOM object is
+          set. To set the value attribute of the element use a
+          <code>@value</code> selector.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;input type="text" name="version"&gt;
+&lt;input type="checkbox" name="published" checked="1"&gt;
+&lt;select name="branch"&gt;
+  &lt;option value="gh-pages"&gt;github.io&lt;/option&gt;
+  &lt;option value="master" selected="1"&gt;master&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-13" class="devtools">
+        <p class="background">Let's get solarized!</p>
+      </div>
+      <li class="example">
+        <div><span>Example 13</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-13">&#182;</a>
+          </div>
+          <p>If you want your selector to match the top level element (that is
+          to say the element being rendered) then use <code>.</code> or an empty
+          string.</p>
+          <p>Oh, and you can use arrays as data too.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-13'))
+.render(
+  [ 'a', 'b', 'c', 'd', 'e', 'f' ],
+  {
+    '.': '0',
+    '': '1',
+    '.:after': '2',
+    ':after': '3',
+    '.@data-e': '4',
+    '@data-f': '5'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-13">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-13">&#182;</a>
+          </div>
+          <p>None of the examples actually show the top level container, so
+          you'll just have to open the console and try it for yourself.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>bcd</code></pre>
+        </div></div>
+      </li>
+
+      <li id="data">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#data">&#182;</a>
+          </div>
+          <h2>Data</h2>
+          <p>We've explored the keys of a directive object, so let's now turn
+          our attention to how Tectonic finds the data (the directive object's
+          values).</p>
+        </div>
+      </li>
+
+      <div id="example-14" class="devtools">
+<pre><code class="json hljs">{
+  <span class="hljs-attr"></span>: <span class="hljs-string"></span>
+}</code></pre>
+      </div>
+      <li class="example">
+        <div><span>Example 14</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-14">&#182;</a>
+          </div>
+          <p>Thus far we have always used the name of the property in the data
+          object to specify the data, but we can also use a constant string or a
+          combination of both.</p>
+          <p>The first value of this directive contains the string
+          <code>'message'</code>, Tectonic see the single quotes and interprets
+          the value as a string literal. The second value of the directive uses
+          the same technique but this time Tectonic sees the double quotes as
+          the string delimiters and interpolates the <code>value</code> property
+          of the data in the middle.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-14'))
+.render(
+  {
+    'value': 'Hello, World!'
+  },
+  {
+    '.hljs-attr': "'message'",
+    '.hljs-string': '"\'" value "\'"'
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-14">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-14">&#182;</a>
+          </div>
+          <p>The result is <code>message</code> inside the
+          <code>hljs-attr</code> element and <code>'Hello, World!'</code> inside
+          the <code>hljs-string</code> element.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;pre&gt;&lt;code class="json hljs"&gt;{
+  &lt;span class="hljs-attr"&gt;message&lt;/span&gt;: &lt;span class="hljs-string"&gt;'Hello, World!'&lt;/span&gt;
+}&lt;/code&gt;&lt;/pre&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-15" class="devtools">
+        <span class="string"></span>,
+        <span class="array"></span>
+      </div>
+      <li class="example">
+        <div><span>Example 15</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-15">&#182;</a>
+          </div>
+          <p>Nested objects can be accessed with either a dot sepatated string
+          or an array.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-15'))
+.render(
+  {
+    nested: {
+     greeting: 'Hello',
+     '.': 'World'
+    }
+  },
+  {
+    '.string': 'nested.greeting',
+    '.array': ['nested', '.']
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-15">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-15">&#182;</a>
+          </div>
+          <p>Note this won't work for objects that have an empty string as a
+          key.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;span class="string"&gt;Hello&lt;/span&gt;,
+&lt;span class="array"&gt;World&lt;/span&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="loops">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#loops">&#182;</a>
+          </div>
+          <h2>Loops</h2>
+        </div>
+      </li>
+
+      <div id="example-16" class="devtools">
+        <ul>
+          <li><a target="_blank"></a></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 16</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-16">&#182;</a>
+          </div>
+          <p>If you provide an object then Tectonic will create a loop.</p>
+          <p>Your object must have one key that contains a left pointing arrow,
+          <code>&lt;-</code>, on the righthand side of the arrow provide the
+          key of the property in your data that Tectonic should loop over and on
+          the lefthand side specify a name that you can use to refer to items in
+          the loop from within a nested directive. The value of this special key
+          is the nested directive.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-16'))
+.render(
+  {
+    libs: [
+      { name: "PURE", url: "https://beebole.com/pure" },
+      { name: "Tectonic.js", url: "http://tecknack.github.io/tectonic" },
+      { name: "jQuery", url: "http://jquery.com" }
+    ]
+  },
+  {
+    'li': {
+      'lib&lt;-libs': {
+        'a': 'lib.name',
+        'a@href': 'lib.url'
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-16">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-16">&#182;</a>
+          </div>
+          <p>The element selected by the outer directive is repeated as
+          necessary and the nested directive is applied to each, once per item
+          in the array. We have told Tectonic that that item will be known as
+          <code>lib</code> from within the nested directive.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;&lt;a target="_blank" href="https://beebole.com/pure"&gt;PURE&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://tecknack.github.io/tectonic"&gt;Tectonic.js&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://jquery.com"&gt;jQuery&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-17" class="devtools">
+        <ul>
+          <li><a target="_blank"></a></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 17</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-17">&#182;</a>
+          </div>
+          <p>Next to the <code>&lt;-</code> key, a <code>filter</code> function
+          can be provided. For each item in the array, this function is called
+          with the item, the item's index and the array itself and if it returns
+          a truthy value the item will included in the loop, otherwise it will
+          be skipped</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-17'))
+.render(
+  {
+    libs: [
+      { name: "PURE", url: "https://beebole.com/pure" },
+      { name: "Tectonic.js", url: "http://tecknack.github.io/tectonic" },
+      { name: "jQuery", url: "http://jquery.com" }
+    ]
+  },
+  {
+    'li': {
+      'lib&lt;-libs': {
+        'a': 'lib.name',
+        'a@href': 'lib.url'
+      },
+      filter: function(lib) {
+        return lib.url.indexOf('http:') &gt;= 0;
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-17">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-17">&#182;</a>
+          </div>
+          <p>The library with <code>https</code> URL is not rendered.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://tecknack.github.io/tectonic"&gt;Tectonic.js&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://jquery.com"&gt;jQuery&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-18" class="devtools">
+        <ul>
+          <li><a target="_blank"></a></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 18</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-18">&#182;</a>
+          </div>
+          <p>Next to the <code>&lt;-</code> key, a <code>sort</code> function
+          can be provided. This function is passed directly to
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort"><code>Array.prototype.sort</code></a>.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-18'))
+.render(
+  {
+    libs: [
+      { name: "PURE", url: "https://beebole.com/pure" },
+      { name: "Tectonic.js", url: "http://tecknack.github.io/tectonic" },
+      { name: "jQuery", url: "http://jquery.com" }
+    ]
+  },
+  {
+    'li': {
+      'lib&lt;-libs': {
+        'a': 'lib.name',
+        'a@href': 'lib.url'
+      },
+      sort: function(libA, libB) {
+        var nameA = libA.name.toUpperCase();
+        var nameB = libB.name.toUpperCase();
+        return nameA &lt; nameB ? -1 : nameA &gt; nameB ? 1 : 0;
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-18">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-18">&#182;</a>
+          </div>
+          <p>The jQuery library is rendered first.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://jquery.com"&gt;jQuery&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="https://beebole.com/pure"&gt;PURE&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://tecknack.github.io/tectonic"&gt;Tectonic.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-19" class="devtools">
+        <ul>
+          <li><a target="_blank"></a></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 19</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-19">&#182;</a>
+          </div>
+          <p>The minimal looping specifier is <code>&lt;-</code> and means that
+          the data object is expected to be an array and the nested directive
+          can access the properties of the items directly.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-19'))
+.render(
+  [
+    { name: "PURE", url: "https://beebole.com/pure" },
+    { name: "Tectonic.js", url: "http://tecknack.github.io/tectonic" },
+    { name: "jQuery", url: "http://jquery.com" }
+  ],
+  {
+    'li': {
+      '&lt;-': {
+        'a': 'name',
+        'a@href': 'url'
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-19">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-19">&#182;</a>
+          </div>
+          <p>The result is the same as <a href="#example-16">example 16</a>.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;&lt;a target="_blank" href="https://beebole.com/pure"&gt;PURE&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://tecknack.github.io/tectonic"&gt;Tectonic.js&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a target="_blank" href="http://jquery.com"&gt;jQuery&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <li id="formattng-functions">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#formatting-functions">&#182;</a>
+          </div>
+          <h2>Formatting Functions</h2>
+        </div>
+      </li>
+
+      <div id="example-20" class="devtools">
+        <ul>
+          <li></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 20</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-20">&#182;</a>
+          </div>
+          <p>Let's see what happens if we provide a function.</p>
+          <p>The function is passed the data object and the target element,
+          which in this case is <code>#example-20</code>.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-20'))
+.render(
+  1.23,
+  {
+    'li': function(x, target) {
+      return x.toFixed(1);
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-20">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-20">&#182;</a>
+          </div>
+          <p>The returned value from the function is subsituted into the DOM.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;1.2&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-21" class="devtools">
+        <ul>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 21</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-21">&#182;</a>
+          </div>
+          <p>The function in the previous example will only be called once,
+          regardless of the number of elements that match the selector. But if
+          this is the case, we can still control the output by returning a
+          function.</p>
+          <p>This function will be called once per matching element, and that
+          element will be passed to the function as the second argument (the
+          first argument is the data object), the third argument will be the
+          index of the element within the set of matched elements and the fourth
+          argument is an array of all the matched elements.
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-21'))
+.render(
+  1.23,
+  {
+    'li': function() {
+      var i = 0;
+      return function(x, li) {
+        return x.toFixed(i++);
+      };
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-21">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-21">&#182;</a>
+          </div>
+          <p>The closure has been used to vary the precision, but the third
+          argument could have also been used.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;1&lt;/li&gt;
+  &lt;li&gt;1.2&lt;/li&gt;
+  &lt;li&gt;1.23&lt;/li&gt;
+  &lt;li&gt;1.230&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-22" class="devtools">
+        <ul>
+          <li></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 22</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-22">&#182;</a>
+          </div>
+          <p>Providing a function in a looping directive is arguably more
+          useful.</p>
+          <p>During a loop the function is given an item from the data array as
+          the first argument, an element that corresponds to that item as the
+          second, the index of the item in the array as the third, the fourth is
+          the set of all matchings elements (the length of this array is the
+          same as the length of the data array) and lastly the data array is
+          provided.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-22'))
+.render(
+  [0.68, 0.92, 0.71, 0.84],
+  {
+    'li': {
+      '&lt;-': {
+        '': function(x, element, i, elements, values) {
+          return x.toFixed(i);
+        }
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-22">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-22">&#182;</a>
+          </div>
+          <p>The function has been called once per item in the array.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;1&lt;/li&gt;
+  &lt;li&gt;0.9&lt;/li&gt;
+  &lt;li&gt;0.71&lt;/li&gt;
+  &lt;li&gt;0.840&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-23" class="devtools">
+        <ul class="children">
+          <li>
+            <a class="name"></a>
+            <ul class="children"></ul>
+          </li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 23</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-23">&#182;</a>
+          </div>
+          <p>We can even use a precompiled renderer as a function. Notice that
+          we must use <code>template.apply</code> to avoid the "chicken or the
+          egg" problem.</p>
+          <p>Note that the <code>ul</code> has been used as the target of the
+          renderer, this is to ensure we don't end up with many
+          <code>#example-23</code> elements.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>var t = new Tectonic($('#example-23 ul'))
+var template = t.compile({
+  'li': {
+    '&lt;-children': {
+      'a': 'name',
+      '.children': function() {
+        return template.apply(this, arguments);
+      }
+    }
+  }
+});
+t.render(
+  { "children": [
+      { "name": "Europe",
+        "children": [
+          { "name": "Belgium",
+            "children": [
+              { "name": "Brussels",
+                "children": null
+              },
+              { "name": "Namur" },
+              { "name": "Antwerpen" }
+            ]
+          },
+          { "name": "Germany" },
+          { "name": "UK"}
+        ]
+      },
+      { "name": "America",
+        "children": [
+          { "name": "US",
+            "children": [
+              { "name": "Alabama" },
+              { "name": "Georgia"}
+            ]
+          },
+          { "name": "Canada" },
+          { "name": "Argentina" }
+        ]
+      },
+      { "name": "Asia" },
+      { "name": "Africa" },
+      { "name": "Antarctica" }
+    ]
+  },
+  template
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-23">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-23">&#182;</a>
+          </div>
+          <p>The render has added comments where <code>li</code> elements would
+          have gone if there was more data. This is in case you want to execute
+          the renderer again when you get more data.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+        <pre><code class="html"
+>&lt;ul class="children"&gt;
+  &lt;li&gt;
+    &lt;a class="name"&gt;Europe&lt;/a&gt;
+    &lt;ul class="children"&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;Belgium&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;li&gt;
+            &lt;a class="name"&gt;Brussels&lt;/a&gt;
+            &lt;ul class="children"&gt;
+              &lt;!--li--&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;a class="name"&gt;Namur&lt;/a&gt;
+            &lt;ul class="children"&gt;
+              &lt;!--li--&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;a class="name"&gt;Antwerpen&lt;/a&gt;
+            &lt;ul class="children"&gt;
+              &lt;!--li--&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;Germany&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;!--li--&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;UK&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;!--li--&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a class="name"&gt;America&lt;/a&gt;
+    &lt;ul class="children"&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;US&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;li&gt;
+            &lt;a class="name"&gt;Alabama&lt;/a&gt;
+            &lt;ul class="children"&gt;
+              &lt;!--li--&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;a class="name"&gt;Georgia&lt;/a&gt;
+            &lt;ul class="children"&gt;
+              &lt;!--li--&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;Canada&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;!--li--&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;
+        &lt;a class="name"&gt;Argentina&lt;/a&gt;
+        &lt;ul class="children"&gt;
+          &lt;!--li--&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a class="name"&gt;Asia&lt;/a&gt;
+    &lt;ul class="children"&gt;
+      &lt;!--li--&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a class="name"&gt;Africa&lt;/a&gt;
+    &lt;ul class="children"&gt;
+      &lt;!--li--&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;a class="name"&gt;Antarctica&lt;/a&gt;
+    &lt;ul class="children"&gt;
+      &lt;!--li--&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
         </div></div>
       </li>
 
