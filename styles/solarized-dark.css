@@ -10,16 +10,17 @@ Orginal Style from ethanschoonover.com/solarized (c) Jeremy Hull <sourdrums@gmai
 }
 
 .solarized-dark
-.content {
+.content,
+.solarized-dark
+pre code {
   background-color: #002b36;
 }
 
 .solarized-dark pre
-.hljs {
+code {
   display: block;
   overflow-x: auto;
-  padding: 0.5em;
-  background: #002b36;
+  padding: 0;
 }
 .solarized-dark pre
 .hljs,

@@ -4,7 +4,7 @@
   <title>tectonic.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport"
-        content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <link rel="stylesheet" media="all" href="docs/docco.css" />
   <link rel="stylesheet"
         href="styles/solarized-dark.css" />
@@ -13,9 +13,6 @@
       vertical-align: text-bottom;
       float: right;
       margin-left: 4px;
-    }
-    .highlight pre code.hljs {
-      padding: 0;
     }
     .highlight {
       padding-top: 1.5em;
@@ -49,7 +46,17 @@
       padding: 0 3px;
       margin-left: -3px;
     }
+    [id^=example-] {
+      padding-top: 1em;
+      margin-left: 10px;
+    }
+    .devtools * {
+      display: none;
+    }
     @media only screen and (min-width: 481px) {
+      [id^=example-] {
+        margin-left: 13px;
+      }
       .example {
         margin-top: 0;
       }
@@ -69,6 +76,9 @@
       .gh-ribbon {
         position: fixed;
       }
+      [id^=example-] {
+        margin-left: 50px;
+      }
       .example > :first-child {
         margin-top: -18px;
       }
@@ -77,8 +87,6 @@
       }
     }
   </style>
-  <script src="highlight.pack.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body class="solarized-dark">
   <a href="https://github.com/tecknack/tectonic">
@@ -218,7 +226,10 @@
         </div>
       </li>
 
-      <li id="example-1" class="example">
+      <div id="example-1" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 1</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -229,8 +240,7 @@
           in our data.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -257,7 +267,10 @@
         </div></div>
       </li>
 
-      <li id="example-2" class="example">
+      <div id="example-2" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 2</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -270,8 +283,7 @@
           equivalent matching.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -300,7 +312,10 @@
         </div></div>
       </li>
 
-      <li id="example-3" class="example">
+      <div id="example-3" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 3</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -310,8 +325,7 @@
           but first we <code>compile</code> our directive.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -343,7 +357,10 @@ t.render(
         </div></div>
       </li>
 
-      <li id="example-4" class="example">
+      <div id="example-4" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 4</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -352,8 +369,7 @@ t.render(
           <p>The precompiled template can also be used independently.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -385,7 +401,10 @@ template.render(
         </div></div>
       </li>
 
-      <li id="example-5" class="example">
+      <div id="example-5" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 5</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -397,8 +416,7 @@ template.render(
           tricks like storing data in the DOM during rendering.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -426,7 +444,10 @@ template.render(
         </div></div>
       </li>
 
-      <li id="example-6" class="example">
+      <div id="example-6" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 6</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -435,8 +456,7 @@ template.render(
           <p>We can use <code>parse</code> with precompiled templates too.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
@@ -465,7 +485,10 @@ t.parse(template);</code></pre>
         </div></div>
       </li>
 
-      <li id="example-7" class="example">
+      <div id="example-7" class="devtools">
+        <span class="hello">Hi there!</span>
+      </div>
+      <li class="example">
         <div><span>Example 7</span></div>
         <div class="annotation">
           <div class="pilwrap">
@@ -477,11 +500,10 @@ t.parse(template);</code></pre>
           that was given to Tectonic.</p>
         </div>
         <div class="content"><div class='highlight'>
-          <pre><code class="html"
-          >&lt;span class="hello"&gt;Hi there!&lt;/span&gt;</code></pre>
+          <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
-          <pre><code class="javascript"
+           <pre><code class="javascript"
 >var t = new Tectonic(document.getElementById('example-7'));
 var template = t.compile(
   {
@@ -517,5 +539,34 @@ template.inverse(t.get());</code></pre>
       </li>
     </ul>
   </div>
+  <script src="tectonic.js"></script>
+  <script src="highlight.pack.js"></script>
+  <script src="node_modules/jquery/dist/jquery.js"></script>
+  <script>
+    $('[id^="example-"]').each(function() {
+      var eg = $(this);
+      var el = $('.content .highlight .html:empty', eg.next('.example'))
+        .text(unindent(eg.html()))
+        .get(0);
+      if (el) hljs.highlightBlock(el);
+    });
+    $('pre code:not(.hljs)').each(function() { hljs.highlightBlock(this); });
+    function unindent(str) {
+      var lines = str.split('\n');
+      var indent = -1;
+      var fixed = [];
+      for (var i = 0, ii = lines.length; i < ii; i++) {
+        if (lines[i] || fixed.length > 0) {
+          if (indent < 0) {
+            indent = lines[i].search(/\S/);
+          }
+          fixed.push(lines[i].substring(indent));
+        }
+      }
+      return fixed.join('\n').replace(/\s+$/, '');
+    }
+    console.log("%cI see you've come to play! Welcome! All the elements mentioned in the examples are actually in the DOM, and jQuery is here too!\nSo, to try the first example you would type:\n%cnew Tectonic($('#example-1')).autoRender({ hello: 'Hello, World!' });", 'font:16px/24px sans-serif;color:#30404f;background-color:#fff', 'font:11px/16px monospace;color:#30404f;background-color:#fff');
+    console.log("%cBut first, remove devtools classes:\n%c$('*').removeClass('devtools');", 'font:16px/24px sans-serif;color:#30404f;background-color:#fff', 'font:11px/16px monospace;color:#30404f;background-color:#fff')
+  </script>
 </body>
 </html>
