@@ -747,8 +747,8 @@ content must be switched between two alternative values.</p>
               <p>Creates a renderer function for one key-value pair (i.e. the specified <code>spec</code>
 and <code>template</code> pair). Note that the specified <code>basis</code> is an array of DOM
 nodes to support recursively calling <a href="#compilers"><code>compile</code></a> with the results
-<a href="#section-79"><code>Tectonic.plugin.find</code></a> as the <code>basis</code> (e.g. see
-<a href="#section-90"><code>Tectonic.plugin.loopWriter</code></a>).
+<a href="#section-78"><code>Tectonic.plugin.find</code></a> as the <code>basis</code> (e.g. see
+<a href="#section-89"><code>Tectonic.plugin.loopWriter</code></a>).
 This method is responsible for coordinating the five methods that is
 generated from the <a href="#plugin"><code>Tectonic.plugin</code></a>, namely a finder, writer,
 formatter, parser and reader. To that end, no assumption is made about the
@@ -901,7 +901,7 @@ The common use case will be a single node for the data.</p>
               </div>
               <p>Data can be tailored to each and every node by supplying a function
 that returns a function as the value of the directive. E.g. see
-<a href="#section-147"><code>Tectonic.toggleClass</code></a>.</p>
+<a href="#section-174"><code>Tectonic.toggleClass</code></a>.</p>
 
             </div>
             
@@ -1026,7 +1026,7 @@ SVG could override <a href="#writers"><code>Tectonic.plugin.writer</code></a> an
 <code>attrWriter</code> and <code>loopParser</code>); authors using Backbone models could override
 <code>Tectonic.plugin.reader</code> and <a href="#formatters"><code>Tectonic.plugin.formatter</code></a> (or
 just <code>propFormatter</code> and <code>propReader</code>); or if you wish to use jQuery/Sizzle,
-<a href="#section-79"><code>Tectonic.plugin.find</code></a> needs to be overridden.</p>
+<a href="#section-78"><code>Tectonic.plugin.find</code></a> needs to be overridden.</p>
 <p>The five plugin methods used in <a href="#compiler"><code>compiler</code></a> above, act as despatchers based on
 either the spec or the template.</p>
 
@@ -1445,7 +1445,7 @@ number of items in the data.</p>
                 <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <p>Used in the default case, passes <code>spec.selector</code> to
-<a href="#section-79"><code>Tectonic.plugin.find</code></a>.</p>
+<a href="#section-78"><code>Tectonic.plugin.find</code></a>.</p>
 
             </div>
             
@@ -1934,7 +1934,7 @@ prepend when <code>target</code> is already empty.</p>
                 <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
               <p>Otherwise, let the renderer complete the replacement.
-See <a href="#section-47"><code>renderAction</code></a>.</p>
+See <a href="#section-46"><code>renderAction</code></a>.</p>
 
             </div>
             
@@ -1974,7 +1974,7 @@ See <a href="#section-47"><code>renderAction</code></a>.</p>
                 <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
               <p>Otherwise, let the renderer complete the replacement.
-See <a href="#section-47"><code>renderAction</code></a>.</p>
+See <a href="#section-46"><code>renderAction</code></a>.</p>
 
             </div>
             
@@ -2461,7 +2461,7 @@ of <code>basis</code> becomes the new <code>basis</code> and the object referenc
     <span class="hljs-keyword">var</span> p = <span class="hljs-keyword">this</span>;
     <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elementParser</span>(<span class="hljs-params">source, finder</span>) </span>{
       <span class="hljs-keyword">var</span> value, original;
-      <span class="hljs-keyword">var</span> target = finder(source)[<span class="hljs-number">0</span>]; <span class="hljs-comment">//<span class="hljs-doctag">TODO:</span> handle missing or many</span></pre></div></div>
+      <span class="hljs-keyword">var</span> target = finder(source)[<span class="hljs-number">0</span>]; <span class="hljs-comment">//<span class="hljs-doctag">TODO:</span> handle many targets</span></pre></div></div>
             
         </li>
         
@@ -2471,6 +2471,21 @@ of <code>basis</code> becomes the new <code>basis</code> and the object referenc
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-130">&#182;</a>
+              </div>
+              <p>When there’s no target then we can’t go any further.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!target) <span class="hljs-keyword">return</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-131">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-131">&#182;</a>
               </div>
               <p>When appending or prepending, also find the same element in the basis
 in order to compare later.</p>
@@ -2484,11 +2499,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-131">
+        <li id="section-132">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-131">&#182;</a>
+                <a class="pilcrow" href="#section-132">&#182;</a>
               </div>
               <p>Particularly useful for elements.</p>
 
@@ -2499,11 +2514,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-132">
+        <li id="section-133">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-132">&#182;</a>
+                <a class="pilcrow" href="#section-133">&#182;</a>
               </div>
               <p>Since input elements do not allow child nodes it is more useful to
 treat the <code>value</code> property as its content. This behaviour also works
@@ -2517,11 +2532,11 @@ well for textareas.</p>
         </li>
         
         
-        <li id="section-133">
+        <li id="section-134">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-133">&#182;</a>
+                <a class="pilcrow" href="#section-134">&#182;</a>
               </div>
               <p>Given that we earlier found the same element from the <code>basis</code>,
 compare <code>value</code> to the original value and find the difference.</p>
@@ -2540,11 +2555,11 @@ compare <code>value</code> to the original value and find the difference.</p>
         </li>
         
         
-        <li id="section-134">
+        <li id="section-135">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-134">&#182;</a>
+                <a class="pilcrow" href="#section-135">&#182;</a>
               </div>
               <p>Otherwise <code>textContent</code> is considered to be the data.</p>
 
@@ -2561,11 +2576,11 @@ compare <code>value</code> to the original value and find the difference.</p>
         </li>
         
         
-        <li id="section-135">
+        <li id="section-136">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-135">&#182;</a>
+                <a class="pilcrow" href="#section-136">&#182;</a>
               </div>
               <p>To extend the functionality to other node types, simply use
 <code>nodeValue</code>.</p>
@@ -2585,11 +2600,11 @@ compare <code>value</code> to the original value and find the difference.</p>
         </li>
         
         
-        <li id="section-136">
+        <li id="section-137">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-136">&#182;</a>
+                <a class="pilcrow" href="#section-137">&#182;</a>
               </div>
               <p>Used in the case where <code>spec</code> refers to an element’s attribute.</p>
 
@@ -2604,11 +2619,11 @@ compare <code>value</code> to the original value and find the difference.</p>
         </li>
         
         
-        <li id="section-137">
+        <li id="section-138">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-137">&#182;</a>
+                <a class="pilcrow" href="#section-138">&#182;</a>
               </div>
               <p>When appending or prepending, also find the same element in the basis
 in order to compare later.</p>
@@ -2622,11 +2637,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-138">
+        <li id="section-139">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-138">&#182;</a>
+                <a class="pilcrow" href="#section-139">&#182;</a>
               </div>
               <p>Attribute selectors are particularly useful for elements.</p>
 
@@ -2637,11 +2652,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-139">
+        <li id="section-140">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-139">&#182;</a>
+                <a class="pilcrow" href="#section-140">&#182;</a>
               </div>
               <p>Both <code>selected</code> and <code>checked</code> attributes are booleans.</p>
 
@@ -2656,11 +2671,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-140">
+        <li id="section-141">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-140">&#182;</a>
+                <a class="pilcrow" href="#section-141">&#182;</a>
               </div>
               <p>Treat class attribute (and aliases) specially.</p>
 
@@ -2681,11 +2696,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-141">
+        <li id="section-142">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-141">&#182;</a>
+                <a class="pilcrow" href="#section-142">&#182;</a>
               </div>
               <p>For all other attributes of elements use <code>getAttribute</code>.</p>
 
@@ -2702,11 +2717,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-142">
+        <li id="section-143">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-142">&#182;</a>
+                <a class="pilcrow" href="#section-143">&#182;</a>
               </div>
               <p>For other node types simply use properties of the <code>target</code> node.</p>
 
@@ -2725,11 +2740,11 @@ in order to compare later.</p>
         </li>
         
         
-        <li id="section-143">
+        <li id="section-144">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-143">&#182;</a>
+                <a class="pilcrow" href="#section-144">&#182;</a>
               </div>
               <p>If the specified <code>original</code> string is located in tne specified <code>value</code>
 string, then return the proceeding portion if <code>end</code> is true or the
@@ -2752,26 +2767,14 @@ preceeding portion if <code>end</code> is <code>false</code>. Otherwise, return 
         </li>
         
         
-        <li id="section-144">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-144">&#182;</a>
-              </div>
-              <h2 id="readers">Readers</h2>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-145">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-145">&#182;</a>
               </div>
-              
+              <h2 id="readers">Readers</h2>
+
             </div>
             
         </li>
@@ -2782,6 +2785,18 @@ preceeding portion if <code>end</code> is <code>false</code>. Otherwise, return 
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-146">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-147">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-147">&#182;</a>
               </div>
               <p>Returns a function to place reconstructed values from the DOM back into a
 data object.
@@ -2812,11 +2827,11 @@ the <code>data</code> argument is simply passed through (after modification).</p
         </li>
         
         
-        <li id="section-147">
+        <li id="section-148">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-147">&#182;</a>
+                <a class="pilcrow" href="#section-148">&#182;</a>
               </div>
               <p>As per <a href="#formatters"><code>Tectonic.plugin.formatter</code></a> strings may be any
 combination of literal strings (surrounded by either single or double
@@ -2839,11 +2854,11 @@ quotes) or a path of a property in the data object.</p>
         </li>
         
         
-        <li id="section-148">
+        <li id="section-149">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-148">&#182;</a>
+                <a class="pilcrow" href="#section-149">&#182;</a>
               </div>
               <p>Otherwise, treat the two strings as one.</p>
 
@@ -2866,11 +2881,11 @@ quotes) or a path of a property in the data object.</p>
         </li>
         
         
-        <li id="section-149">
+        <li id="section-150">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-149">&#182;</a>
+                <a class="pilcrow" href="#section-150">&#182;</a>
               </div>
               <p>A reader that does nothing simply returns the data object (i.e. the first
 argument).</p>
@@ -2882,11 +2897,11 @@ argument).</p>
         </li>
         
         
-        <li id="section-150">
+        <li id="section-151">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-150">&#182;</a>
+                <a class="pilcrow" href="#section-151">&#182;</a>
               </div>
               <p>Set a property in the data object.</p>
 
@@ -2901,11 +2916,11 @@ argument).</p>
         </li>
         
         
-        <li id="section-151">
+        <li id="section-152">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-151">&#182;</a>
+                <a class="pilcrow" href="#section-152">&#182;</a>
               </div>
               <p>If the property looks like a non-negative number then it should
 probably be an array.</p>
@@ -2928,11 +2943,11 @@ probably be an array.</p>
         </li>
         
         
-        <li id="section-152">
+        <li id="section-153">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-152">&#182;</a>
+                <a class="pilcrow" href="#section-153">&#182;</a>
               </div>
               <p>Returns a reader function that consumes the <code>value</code> by either discarding
 literal strings or other readers.</p>
@@ -2949,11 +2964,11 @@ literal strings or other readers.</p>
         </li>
         
         
-        <li id="section-153">
+        <li id="section-154">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-153">&#182;</a>
+                <a class="pilcrow" href="#section-154">&#182;</a>
               </div>
               <p>When <code>part</code> is a reader it will consume <code>value</code> up to the next
 string.</p>
@@ -2967,11 +2982,11 @@ string.</p>
         </li>
         
         
-        <li id="section-154">
+        <li id="section-155">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-154">&#182;</a>
+                <a class="pilcrow" href="#section-155">&#182;</a>
               </div>
               <p>Next part is a string (because it’s not a function), extract
 the preceeding string (and pass it to the <code>part</code> reader) and
@@ -2991,11 +3006,11 @@ skip the next part.</p>
         </li>
         
         
-        <li id="section-155">
+        <li id="section-156">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-155">&#182;</a>
+                <a class="pilcrow" href="#section-156">&#182;</a>
               </div>
               <p>When the next part is not a string there is no way to tell how
 the value should be split across the two readers.</p>
@@ -3010,11 +3025,11 @@ the value should be split across the two readers.</p>
         </li>
         
         
-        <li id="section-156">
+        <li id="section-157">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-156">&#182;</a>
+                <a class="pilcrow" href="#section-157">&#182;</a>
               </div>
               <p>When <code>part</code> is a string it will be at the beginning of <code>value</code>.</p>
 
@@ -3032,26 +3047,14 @@ the value should be split across the two readers.</p>
         </li>
         
         
-        <li id="section-157">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-157">&#182;</a>
-              </div>
-              <h2 id="compilers">Compilers</h2>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-158">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-158">&#182;</a>
               </div>
-              
+              <h2 id="compilers">Compilers</h2>
+
             </div>
             
         </li>
@@ -3063,6 +3066,18 @@ the value should be split across the two readers.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-159">&#182;</a>
               </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-160">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-160">&#182;</a>
+              </div>
               <p>Compile the specified <code>basis</code> element according to the specified
 <code>directive</code>.</p>
 
@@ -3073,11 +3088,11 @@ the value should be split across the two readers.</p>
         </li>
         
         
-        <li id="section-160">
+        <li id="section-161">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-160">&#182;</a>
+                <a class="pilcrow" href="#section-161">&#182;</a>
               </div>
               <p>Each selector-directive pair in the <code>directive</code> object is compiled
 individually.</p>
@@ -3092,11 +3107,11 @@ individually.</p>
         </li>
         
         
-        <li id="section-161">
+        <li id="section-162">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-161">&#182;</a>
+                <a class="pilcrow" href="#section-162">&#182;</a>
               </div>
               <p>The renderer function is the accumulation of all <code>actions</code>.</p>
 
@@ -3112,11 +3127,11 @@ individually.</p>
         </li>
         
         
-        <li id="section-162">
+        <li id="section-163">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-162">&#182;</a>
+                <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
               <p>Likewise, parsing is the accumulation of all the inverse functions
 produced by <a href="#compiler"><code>compiler</code></a>.</p>
@@ -3137,11 +3152,11 @@ produced by <a href="#compiler"><code>compiler</code></a>.</p>
         </li>
         
         
-        <li id="section-163">
+        <li id="section-164">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-163">&#182;</a>
+                <a class="pilcrow" href="#section-164">&#182;</a>
               </div>
               <p>Auto compile inspects the class names of every descendant of the specified
 <code>element</code> and searches the specified <code>data</code> object for a matching property.
@@ -3226,26 +3241,14 @@ specified <code>directive</code> to produce the final renderer function.</p>
         </li>
         
         
-        <li id="section-164">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-164">&#182;</a>
-              </div>
-              <h2 id="helpers">Helpers</h2>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-165">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-165">&#182;</a>
               </div>
-              
+              <h2 id="helpers">Helpers</h2>
+
             </div>
             
         </li>
@@ -3256,6 +3259,18 @@ specified <code>directive</code> to produce the final renderer function.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-166">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-167">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-167">&#182;</a>
               </div>
               <p>Used when a looping directive is encountered to extract the template and
 nested directive.</p>
@@ -3269,11 +3284,11 @@ nested directive.</p>
         </li>
         
         
-        <li id="section-167">
+        <li id="section-168">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-167">&#182;</a>
+                <a class="pilcrow" href="#section-168">&#182;</a>
               </div>
               <p>The loopSpec takes the form of <code>lhs&lt;-rhs</code> or <code>lhs&lt;=rhs</code>.  The lefthand
 side (if present) specifies the property name that the nested directive
@@ -3298,11 +3313,11 @@ the property in the data object of the array to loop over.</p>
         </li>
         
         
-        <li id="section-168">
+        <li id="section-169">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-168">&#182;</a>
+                <a class="pilcrow" href="#section-169">&#182;</a>
               </div>
               <p>Returns <code>true</code> if the first argument is an array, <code>false</code> otherwise.</p>
 
@@ -3318,26 +3333,14 @@ the property in the data object of the array to loop over.</p>
         </li>
         
         
-        <li id="section-169">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-169">&#182;</a>
-              </div>
-              <h1 id="utilities">Utilities</h1>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-170">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-170">&#182;</a>
               </div>
-              
+              <h1 id="utilities">Utilities</h1>
+
             </div>
             
         </li>
@@ -3348,6 +3351,18 @@ the property in the data object of the array to loop over.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-171">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-172">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-172">&#182;</a>
               </div>
               <p>Convenience function to attached an inverse function to a user defined
 formatter.</p>
@@ -3370,11 +3385,11 @@ formatter.</p>
         </li>
         
         
-        <li id="section-172">
+        <li id="section-173">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-172">&#182;</a>
+                <a class="pilcrow" href="#section-173">&#182;</a>
               </div>
               <p>A formatter that returns the index of an item in a loop.</p>
 
@@ -3387,11 +3402,11 @@ formatter.</p>
         </li>
         
         
-        <li id="section-173">
+        <li id="section-174">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-173">&#182;</a>
+                <a class="pilcrow" href="#section-174">&#182;</a>
               </div>
               <p>A formatter to add or remove the specified <code>className</code> depending on the
 truthiness of the specified <code>property</code> in the data object. A formatter may be

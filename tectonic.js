@@ -243,8 +243,8 @@ function parseSelector(str) {
 // Creates a renderer function for one key-value pair (i.e. the specified `spec`
 // and `template` pair). Note that the specified `basis` is an array of DOM
 // nodes to support recursively calling [`compile`](#compilers) with the results
-// [`Tectonic.plugin.find`](#section-79) as the `basis` (e.g. see
-// [`Tectonic.plugin.loopWriter`](#section-90)).
+// [`Tectonic.plugin.find`](#section-78) as the `basis` (e.g. see
+// [`Tectonic.plugin.loopWriter`](#section-89)).
 // This method is responsible for coordinating the five methods that is
 // generated from the [`Tectonic.plugin`](#plugin), namely a finder, writer,
 // formatter, parser and reader. To that end, no assumption is made about the
@@ -294,7 +294,7 @@ function compiler(basis, spec, template) {
       var boundData = bindData;
       // Data can be tailored to each and every node by supplying a function
       // that returns a function as the value of the directive. E.g. see
-      // [`Tectonic.toggleClass`](#section-147).
+      // [`Tectonic.toggleClass`](#section-174).
       if (typeof boundData === 'function') {
         boundData = bindData(data, nodes[i], i, nodes);
       }
@@ -334,7 +334,7 @@ var stringDataPattern = / *(?:"([^"]*)"|'([^']*)'|([^'" ]+)) */g;
 // `attrWriter` and `loopParser`); authors using Backbone models could override
 // `Tectonic.plugin.reader` and [`Tectonic.plugin.formatter`](#formatters) (or
 // just `propFormatter` and `propReader`); or if you wish to use jQuery/Sizzle,
-// [`Tectonic.plugin.find`](#section-79) needs to be overridden.
+// [`Tectonic.plugin.find`](#section-78) needs to be overridden.
 //
 // The five plugin methods used in [`compiler`](#compiler) above, act as despatchers based on
 // either the spec or the template.
@@ -477,7 +477,7 @@ Tectonic.plugin = {
   },
 
   // Used in the default case, passes `spec.selector` to
-  // [`Tectonic.plugin.find`](#section-79).
+  // [`Tectonic.plugin.find`](#section-78).
   queryFinder: function(basis, spec, template) {
     var p = this;
     return function queryFinder(target, data) {
@@ -653,7 +653,7 @@ Tectonic.plugin = {
             target.appendChild(valueNode);
           }
           // Otherwise, let the renderer complete the replacement.
-          // See [`renderAction`](#section-47).
+          // See [`renderAction`](#section-46).
           else target = value;
         }
         // To extend the functionality to other node types, simply use
@@ -667,7 +667,7 @@ Tectonic.plugin = {
           target.nodeValue = value;
         }
         // Otherwise, let the renderer complete the replacement.
-        // See [`renderAction`](#section-47).
+        // See [`renderAction`](#section-46).
         else target = value;
       }
       return target;
@@ -843,7 +843,9 @@ Tectonic.plugin = {
     var p = this;
     return function elementParser(source, finder) {
       var value, original;
-      var target = finder(source)[0]; //TODO: handle missing or many
+      var target = finder(source)[0]; //TODO: handle many targets
+      // When there's no target then we can't go any further.
+      if (!target) return;
       // When appending or prepending, also find the same element in the basis
       // in order to compare later.
       if (spec.append || spec.prepend) {
