@@ -950,6 +950,26 @@ var fixtures = [
     fixture:    fromString("<div><tt>: </tt></div>"),
     expected:   fromString("<div><tt>Cats: 1</tt><tt>Dogs: 2</tt><tt>Birds: 3</tt><tt>Mice: 4</tt></div>"),
     exec:       render
+  },
+  {
+    name:       "bound formatter",
+    data:       { "teams": [ "Cats", "Dogs", "Birds", "Mice" ] },
+    directive:  {
+      "tt": {
+        "<-teams": {
+          "": function(team) {
+            return team + " are " + this.status;
+          }
+        }
+      }
+    },
+    fixture:    fromString("<div><tt>: </tt></div>"),
+    expected:   fromString("<div><tt>Cats are GO!</tt><tt>Dogs are GO!</tt><tt>Birds are GO!</tt><tt>Mice are GO!</tt></div>"),
+    exec: function render(expected, element, data, directive, expect) {
+      var t = new Tectonic(element).context({ status: "GO!" });
+      expect(t.render(data, directive).get());
+      return t;
+    }
   }
 ];
 
