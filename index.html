@@ -1274,10 +1274,7 @@ template.inverse(t.get());</code></pre>
 
       <div id="example-21" class="devtools">
         <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
+          <li><a href="#"></a></li>
         </ul>
       </div>
       <li class="example">
@@ -1285,6 +1282,88 @@ template.inverse(t.get());</code></pre>
         <div class="annotation">
           <div class="pilwrap">
             <a class="pilcrow" href="#example-21">&#182;</a>
+          </div>
+          <p>Functions are best without side-effects, but we all need a little
+          global state at times.</p>
+          <p>By default formatting functions are bound to the Tectonic
+          instance, but you can set the context to a different object. Then
+          <code>this</code> will be bound to your provided context object from
+          inside your formatting function. The same is also true of parsing
+          functions.</p>
+          <p>Typically, a plugin will define the context. For example, a
+          Backbone plugin may set the context to be the view that owns the
+          target element being rendered.</p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"></code></pre>
+        </div>
+        <div class='highlight'>
+          <pre><code class="javascript"
+>new Tectonic(document.getElementById('example-21'))
+.context({
+  baseUrl: 'http://tecknack.github.io/tectonic'
+})
+.render(
+  {
+    links: [
+      {
+        name: 'Test suite',
+        href: '/spec/index.html'
+      },
+      {
+        name: 'Code coverage',
+        href: '/coverage/Chrome%2043.0.2357%20(Linux%200.0.0)/tectonic/index.html'
+      },
+      {
+        name: 'Source code',
+        href: '/docs/tectonic.html'
+      }
+    ]
+  },
+  {
+    'li': {
+      '&lt;-links': {
+        'a': 'name',
+        'a@href': function(link) {
+          return this.baseUrl + link;
+        }
+      }
+    }
+  }
+);</code></pre>
+        </div></div>
+      </li>
+
+      <li id="result-21">
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#result-21">&#182;</a>
+          </div>
+          <p></p>
+        </div>
+        <div class="content"><div class='highlight'>
+          <pre><code class="html"
+>&lt;ul&gt;
+  &lt;li&gt;&lt;a href="http://tecknack.github.io/tectonic/spec/index.html"&gt;Test suite&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="http://tecknack.github.io/tectonic/coverage/Chrome%2043.0.2357%20(Linux%200.0.0)/tectonic/index.html"&gt;Code coverage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href="http://tecknack.github.io/tectonic/docs/tectonic.html"&gt;Source code&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        </div></div>
+      </li>
+
+      <div id="example-22" class="devtools">
+        <ul>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+      <li class="example">
+        <div><span>Example 22</span></div>
+        <div class="annotation">
+          <div class="pilwrap">
+            <a class="pilcrow" href="#example-22">&#182;</a>
           </div>
           <p>The function in the previous example will only be called once,
           regardless of the number of elements that match the selector. But if
@@ -1301,7 +1380,7 @@ template.inverse(t.get());</code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
->new Tectonic(document.getElementById('example-21'))
+>new Tectonic(document.getElementById('example-22'))
 .render(
   1.23,
   {
@@ -1316,10 +1395,10 @@ template.inverse(t.get());</code></pre>
         </div></div>
       </li>
 
-      <li id="result-21">
+      <li id="result-22">
         <div class="annotation">
           <div class="pilwrap">
-            <a class="pilcrow" href="#result-21">&#182;</a>
+            <a class="pilcrow" href="#result-22">&#182;</a>
           </div>
           <p>The closure has been used to vary the precision, but the third
           argument could have also been used.</p>
@@ -1335,16 +1414,16 @@ template.inverse(t.get());</code></pre>
         </div></div>
       </li>
 
-      <div id="example-22" class="devtools">
+      <div id="example-23" class="devtools">
         <ul>
           <li></li>
         </ul>
       </div>
       <li class="example">
-        <div><span>Example 22</span></div>
+        <div><span>Example 23</span></div>
         <div class="annotation">
           <div class="pilwrap">
-            <a class="pilcrow" href="#example-22">&#182;</a>
+            <a class="pilcrow" href="#example-23">&#182;</a>
           </div>
           <p>Providing a function in a looping directive is arguably more
           useful.</p>
@@ -1360,7 +1439,7 @@ template.inverse(t.get());</code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
->new Tectonic(document.getElementById('example-22'))
+>new Tectonic(document.getElementById('example-23'))
 .render(
   [0.68, 0.92, 0.71, 0.84],
   {
@@ -1376,10 +1455,10 @@ template.inverse(t.get());</code></pre>
         </div></div>
       </li>
 
-      <li id="result-22">
+      <li id="result-23">
         <div class="annotation">
           <div class="pilwrap">
-            <a class="pilcrow" href="#result-22">&#182;</a>
+            <a class="pilcrow" href="#result-23">&#182;</a>
           </div>
           <p>The function has been called once per item in the array.</p>
         </div>
@@ -1394,7 +1473,7 @@ template.inverse(t.get());</code></pre>
         </div></div>
       </li>
 
-      <div id="example-23" class="devtools">
+      <div id="example-24" class="devtools">
         <ul class="children">
           <li>
             <a class="name"></a>
@@ -1403,24 +1482,24 @@ template.inverse(t.get());</code></pre>
         </ul>
       </div>
       <li class="example">
-        <div><span>Example 23</span></div>
+        <div><span>Example 24</span></div>
         <div class="annotation">
           <div class="pilwrap">
-            <a class="pilcrow" href="#example-23">&#182;</a>
+            <a class="pilcrow" href="#example-24">&#182;</a>
           </div>
           <p>We can even use a precompiled renderer as a function. Notice that
           we must use <code>template.apply</code> to avoid the "chicken or the
           egg" problem.</p>
           <p>Note that the <code>ul</code> has been used as the target of the
           renderer, this is to ensure we don't end up with many
-          <code>#example-23</code> elements.</p>
+          <code>#example-24</code> elements.</p>
         </div>
         <div class="content"><div class='highlight'>
           <pre><code class="html"></code></pre>
         </div>
         <div class='highlight'>
           <pre><code class="javascript"
->var t = new Tectonic($('#example-23 ul'))
+>var t = new Tectonic($('#example-24 ul'))
 var template = t.compile({
   'li': {
     '&lt;-children': {
@@ -1470,10 +1549,10 @@ t.render(
         </div></div>
       </li>
 
-      <li id="result-23">
+      <li id="result-24">
         <div class="annotation">
           <div class="pilwrap">
-            <a class="pilcrow" href="#result-23">&#182;</a>
+            <a class="pilcrow" href="#result-24">&#182;</a>
           </div>
           <p>The render has added comments where <code>li</code> elements would
           have gone if there was more data. This is in case you want to execute
