@@ -87,6 +87,17 @@ function Tectonic(element, basis) {
     return element;
   };
 
+  // Accessor for this object's context.
+  // The specified context object is bound to the compiled renderer function.
+  var context = this;
+  this.context = function(ctx) {
+    if (arguments.length === 0) {
+      return context;
+    }
+    context = ctx;
+    return this;
+  }
+
   this.clone = function(deep) {
     // Creates a deep copy of this object. Note that returned object's `element`
     // will be detached from the browser's DOM.
@@ -184,10 +195,10 @@ function Tectonic(element, basis) {
     //     }
     var tectonic = this;
     var bounded = function(data) {
-      return renderer(tectonic.equals(this) ? element : basis.cloneNode(true), data);
+      return renderer.call(context, tectonic.equals(this) ? element : basis.cloneNode(true), data);
     };
     bounded.inverse = function(el) {
-      return renderer.inverse(tectonic.equals(this) ? element : el || basis, {});
+      return renderer.inverse.call(context, tectonic.equals(this) ? element : el || basis, {});
     };
     return bounded;
   };
@@ -287,7 +298,7 @@ function compiler(basis, spec, template) {
   var renderAction = function(target, data, index, elements, values) {
     // The same data will be applied to every node selected by `spec`.
     // The common use case will be a single node for the data.
-    var bindData = format(data, target, index, elements, values);
+    var bindData = format.call(this, data, target, index, elements, values);
     var nodes = find(target, bindData, basis);
 
     for (var i = 0, ii = nodes.length; i < ii; i++) {
@@ -296,10 +307,10 @@ function compiler(basis, spec, template) {
       // that returns a function as the value of the directive. E.g. see
       // [`Tectonic.toggleClass`](#section-174).
       if (typeof boundData === 'function') {
-        boundData = bindData(data, nodes[i], i, nodes);
+        boundData = bindData.call(this, data, nodes[i], i, nodes);
       }
       // Now, update the DOM.
-      var newNode = write(nodes[i], boundData, i, nodes);
+      var newNode = write.call(this, nodes[i], boundData, i, nodes);
       // Typically `write` simply updates the DOM, but if a different node is
       // produced, update the DOM with that node instead.
       if (newNode !== nodes[i]) {
@@ -313,7 +324,10 @@ function compiler(basis, spec, template) {
   // Parsing relies on `parse` and `read`
   if (parse && read) {
     renderAction.inverse = function(source, data) {
-      return read(data, parse(source, find));
+      if (read.length > 2) {
+        return read.call(this, data, parse(source, find), find(source));
+      }
+      return read.call(this, data, parse(source, find));
     };
   }
   return renderAction;
@@ -608,7 +622,7 @@ Tectonic.plugin = {
       if (loopSpec.lhs) {
         (data = {})[loopSpec.lhs] = items[i];
       }
-      return renderer(target, data, i, targets, items);
+      return renderer.call(this, target, data, i, targets, items);
     };
   },
 
@@ -827,7 +841,7 @@ Tectonic.plugin = {
       var array = [], data;
       for (var i = 0, ii = nodes.length; i < ii; i++) {
         // Recontruct the data from the DOM node.
-        data = renderer.inverse(nodes[i], data = {});
+        data = renderer.inverse.call(this, nodes[i], data = {});
         // The lefthand side of `<-`, if present, is used to refer to the data.
         if (loopSpec.lhs) {
           data = data[loopSpec.lhs];
@@ -1087,7 +1101,7 @@ Tectonic.plugin = {
     // The renderer function is the accumulation of all `actions`.
     var renderer = function(element, data, index, elements, values) {
       for (var i in actions) {
-        actions[i](element, data, index, elements, values);
+        actions[i].call(this, element, data, index, elements, values);
       }
       return element;
     };
@@ -1096,7 +1110,7 @@ Tectonic.plugin = {
     renderer.inverse = function(element, data) {
       for (var i in actions) {
         if (actions[i].inverse) {
-          data = actions[i].inverse(element, data);
+          data = actions[i].inverse.call(this, element, data);
         }
       }
       return data;
