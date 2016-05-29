@@ -5,6 +5,7 @@
   "main": "tectonic.js",
   "scripts": {
     "doc": "docco tectonic.js",
+    "lint": "eslint tectonic.js",
     "test": "eslint tectonic.js && echo 'Point your browser to http://localhost:9876/base/spec/index.html or http://localhost:9876/base/coverage/'; karma start"
   },
   "repository": {
