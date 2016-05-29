@@ -959,7 +959,13 @@
       var p = this;
       return function attrParser (source, finder) {
         var value, original;
-        var target = finder(source)[0]; // TODO: handle missing
+        // Use the first found element; we assume they are all the same (if they
+        // are different consider using a looping directive).
+        var target = finder(source)[0];
+        // When there's no target then we can't go any further.
+        if (!target) {
+          return;
+        }
         // When appending or prepending, also find the same element in the basis
         // in order to compare later.
         if (spec.append || spec.prepend) {
