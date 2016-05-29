@@ -305,7 +305,7 @@
     // These renderers take a signgle `target` element to be rendered with
     // `data`.  The other arguments are optional and typically only present when
     // handling loop directives.
-    var renderAction = function renderAction (data, target, idx, els, vals) {
+    var renderAction = function renderAction (data, target) {
       // The same data will be applied to every node selected by `spec`.
       // The common use case will be a single node for the data.
       var bindData = format.apply(this, arguments);
