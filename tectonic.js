@@ -901,7 +901,9 @@
       var p = this;
       return function elementParser (source, finder) {
         var value, original;
-        var target = finder(source)[0]; // TODO: handle many targets
+        // Use the first found element; we assume they are all the same (if they
+        // are different consider using a looping directive).
+        var target = finder(source)[0];
         // When there's no target then we can't go any further.
         if (!target) {
           return;
