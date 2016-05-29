@@ -5,7 +5,7 @@
   "main": "tectonic.js",
   "scripts": {
     "doc": "docco tectonic.js",
-    "test": "echo 'Point your browser to http://localhost:9876/base/spec/index.html or http://localhost:9876/base/coverage/'; karma start"
+    "test": "eslint tectonic.js && echo 'Point your browser to http://localhost:9876/base/spec/index.html or http://localhost:9876/base/coverage/'; karma start"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "docco": "^0.7.0",
     "dom-compare": "^0.2.1",
+    "eslint": "^2.11.0",
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
     "jasmine-jquery": "^2.1.1",
