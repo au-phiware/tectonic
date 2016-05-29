@@ -796,7 +796,7 @@ var fixtures = [
             "a": "name",
             "a@onclick": "\"alert('\"name\"');\"",
             ".children": function() {
-              return directive.apply(this, arguments);
+              return directive.apply(void 0, arguments);
             }
           }
         }
