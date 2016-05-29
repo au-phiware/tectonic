@@ -203,10 +203,10 @@
       //     }
       var tectonic = this;
       var bounded = function bounded (data) {
-        return renderer.call(ctx,
+        return renderer.call(ctx, data,
             tectonic.equals(this)
             ? element
-            : basis.cloneNode(true), data);
+            : basis.cloneNode(true));
       };
       bounded.inverse = function inverse (el) {
         return renderer.inverse.call(ctx,
@@ -305,10 +305,10 @@
     // These renderers take a signgle `target` element to be rendered with
     // `data`.  The other arguments are optional and typically only present when
     // handling loop directives.
-    var renderAction = function renderAction (target, data, idx, els, vals) {
+    var renderAction = function renderAction (data, target, idx, els, vals) {
       // The same data will be applied to every node selected by `spec`.
       // The common use case will be a single node for the data.
-      var bindData = format.call(this, data, target, idx, els, vals);
+      var bindData = format.apply(this, arguments);
       var nodes = find(target, bindData, basis);
 
       for (var i = 0, ii = nodes.length; i < ii; i++) {
@@ -646,7 +646,7 @@
         if (loopSpec.lhs) {
           (data = {})[loopSpec.lhs] = items[i];
         }
-        return renderer.call(this, target, data, i, targets, items);
+        return renderer.call(this, data, target, i, targets, items);
       };
     },
 
@@ -1180,7 +1180,7 @@
         }
       }
       // The renderer function is the accumulation of all `actions`.
-      var renderer = function renderer (element) {
+      var renderer = function renderer (data, element) {
         for (var i = 0, ii = actions.length; i < ii; i++) {
           actions[i].apply(this, arguments);
         }
@@ -1191,7 +1191,7 @@
       renderer.inverse = function inverse (element, data) {
         for (var i = 0, ii = actions.length; i < ii; i++) {
           if (actions[i].inverse) {
-            data = actions[i].inverse.call(this, element, data);
+            data = actions[i].inverse.apply(this, arguments);
           }
         }
         return data;
@@ -1252,7 +1252,7 @@
                       } else {
                         spec.selector = void 0;
                         fn = this.stringFormatter(element, spec, d[j]);
-                        compiler([els[j]], spec, fn)(els[j], d[j]);
+                        compiler([els[j]], spec, fn)(d[j], els[j]);
                       }
                     }
                   } else {
@@ -1264,7 +1264,7 @@
                 } else {
                   spec.selector = void 0;
                   fn = this.stringFormatter(element, spec, d);
-                  compiler([e], spec, fn)(e, d);
+                  compiler([e], spec, fn)(d, e);
                 }
               }
               stack.unshift(head);
@@ -1278,7 +1278,7 @@
       }
       for (var k in directive) {
         if (directive.hasOwnProperty(k)) {
-          compiler([element], parseSelector(k), directive[k])(element, data);
+          compiler([element], parseSelector(k), directive[k])(data, element);
         }
       }
       return function autoRenderer () {
