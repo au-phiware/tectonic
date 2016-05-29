@@ -265,8 +265,8 @@
   // Creates a renderer function for one key-value pair (i.e. the specified
   // `spec` and `template` pair). Note that the specified `basis` is an array of
   // DOM nodes to support recursively calling [`compile`](#compilers) with the
-  // results [`Tectonic.plugin.find`](#section-78) as the `basis` (e.g. see
-  // [`Tectonic.plugin.loopWriter`](#section-89)).  This method is responsible
+  // results [`Tectonic.plugin.find`](#section-79) as the `basis` (e.g. see
+  // [`Tectonic.plugin.loopWriter`](#section-90)).  This method is responsible
   // for coordinating the five methods that is generated from the
   // [`Tectonic.plugin`](#plugin), namely a finder, writer, formatter, parser
   // and reader. To that end, no assumption is made about the information that
@@ -315,7 +315,7 @@
         var boundData = bindData;
         // Data can be tailored to each and every node by supplying a function
         // that returns a function as the value of the directive. E.g. see
-        // [`Tectonic.toggleClass`](#section-174).
+        // [`Tectonic.toggleClass`](#section-178).
         if (typeof boundData === 'function') {
           boundData = bindData.call(this, data, nodes[i], i, nodes);
         }
@@ -363,7 +363,7 @@
   // override `Tectonic.plugin.reader` and
   // [`Tectonic.plugin.formatter`](#formatters) (or just `propFormatter` and
   // `propReader`); or if you wish to use jQuery/Sizzle,
-  // [`Tectonic.plugin.find`](#section-78) needs to be overridden.
+  // [`Tectonic.plugin.find`](#section-79) needs to be overridden.
   //
   // The five plugin methods used in [`compiler`](#compiler) above, act as
   // despatchers based on either the spec or the template.
@@ -509,7 +509,7 @@
     },
 
     // Used in the default case, passes `spec.selector` to
-    // [`Tectonic.plugin.find`](#section-78).
+    // [`Tectonic.plugin.find`](#section-79).
     queryFinder: function queryFinder (basis, spec) {
       var p = this;
       return function queryFinder (target) {
@@ -693,7 +693,7 @@
               target.appendChild(valueNode);
             }
             // Otherwise, let the renderer complete the replacement.
-            // See [`renderAction`](#section-46).
+            // See [`renderAction`](#section-47).
             else {
               target = value;
             }
@@ -709,7 +709,7 @@
             target.nodeValue = value;
           }
           // Otherwise, let the renderer complete the replacement.
-          // See [`renderAction`](#section-46).
+          // See [`renderAction`](#section-47).
           else {
             target = value;
           }
