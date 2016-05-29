@@ -1505,7 +1505,7 @@ var template = t.compile({
     '&lt;-children': {
       'a': 'name',
       '.children': function() {
-        return template.apply(this, arguments);
+        return template.apply(void 0, arguments);
       }
     }
   }
