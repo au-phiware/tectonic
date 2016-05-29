@@ -321,11 +321,11 @@ var fixtures = [
     fixture:    fromString('<div><div class="thing">Hello, <span></span>.</div></div>'),
     expected:   fromString('<div><div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div><div class="thing">Hello, <span>World</span>.</div></div><div><div class="thing">Hello, <span>World</span>.</div><div class="thing">Hello, <span>PURE</span>.</div><div class="thing">Hello, <span>Sizzle</span>.</div></div></div>'),
     exec: function(expected, element, data, directive) {
-      render(expected.children[0], element, data, directive, expect, function(actual) {
+      render(expected.children[0], element, data, directive, function(actual) {
         expect(actual.outerHTML).toEqual(expected.children[0].outerHTML);
       });
       delete directive[".thing"].sort;
-      render(expected.children[1], element, data, directive, expect, function(actual) {
+      render(expected.children[1], element, data, directive, function(actual) {
         expect(actual.outerHTML).toEqual(expected.children[1].outerHTML);
       });
     }
