@@ -42,7 +42,7 @@
     "accessor-pairs": 2, // enforce getter and setter pairs in objects
     "array-callback-return": 2, // enforce return statements in callbacks of array methods
     "block-scoped-var": 2, // enforce the use of variables within the scope they are defined
-    "complexity": 2, // enforce a maximum cyclomatic complexity allowed in a program
+    "complexity": 0, // enforce a maximum cyclomatic complexity allowed in a program
     "consistent-return": 0, // require return statements to either always or never specify values
     "curly": 2, // enforce consistent brace style for all control statements
     "default-case": 2, // require default cases in switch statements

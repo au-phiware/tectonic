@@ -266,7 +266,7 @@
   // `spec` and `template` pair). Note that the specified `basis` is an array of
   // DOM nodes to support recursively calling [`compile`](#compilers) with the
   // results [`Tectonic.plugin.find`](#section-79) as the `basis` (e.g. see
-  // [`Tectonic.plugin.loopWriter`](#section-90)).  This method is responsible
+  // [`Tectonic.plugin.loopWriter`](#section-91)).  This method is responsible
   // for coordinating the five methods that is generated from the
   // [`Tectonic.plugin`](#plugin), namely a finder, writer, formatter, parser
   // and reader. To that end, no assumption is made about the information that
@@ -315,7 +315,7 @@
         var boundData = bindData;
         // Data can be tailored to each and every node by supplying a function
         // that returns a function as the value of the directive. E.g. see
-        // [`Tectonic.toggleClass`](#section-178).
+        // [`Tectonic.toggleClass`](#section-179).
         if (typeof boundData === 'function') {
           boundData = bindData.call(this, data, nodes[i], i, nodes);
         }
@@ -561,8 +561,9 @@
       return function attrWriter (target, value) {
         // Attribute selectors are particularly useful for elements.
         if (target.nodeType === 1) {
+          var tagName = target.tagName.toUpperCase();
           // As a convenience, handle dropdown boxes specially.
-          if (target.tagName.toUpperCase() === "OPTION" &&
+          if (tagName === "OPTION" &&
               spec.attr === "selected") {
             var selected = value === 'false' ? false : Boolean(value);
             target.selected = selected;
@@ -573,7 +574,7 @@
             }
           }
           // Check and radio boxes also require specail handling.
-          else if (target.tagName.toUpperCase() === "INPUT" &&
+          else if (tagName === "INPUT" &&
               spec.attr === "checked") {
             var checked = value === 'false' ? false : Boolean(value);
             target.checked = checked;
@@ -581,6 +582,18 @@
               target.setAttribute("checked", value);
             } else {
               target.removeAttribute("checked");
+            }
+          }
+          // Disabled elements are special too.
+          else if (spec.attr === "disabled" &&
+              /^(INPUT|TEXTAREA|BUTTON|SELECT|OPTION|OPTGROUP|FIELDSET)$/.test(
+                tagName)) {
+            var disabled = value === 'false' ? false : Boolean(value);
+            target.disabled = disabled;
+            if (disabled) {
+              target.setAttribute("disabled", value);
+            } else {
+              target.removeAttribute("disabled");
             }
           }
           // Treat class attribute (and aliases) specially.
@@ -973,13 +986,18 @@
         }
         // Attribute selectors are particularly useful for elements.
         if (target.nodeType === 1) {
-          // Both `selected` and `checked` attributes are booleans.
-          if (target.tagName.toUpperCase() === "OPTION" &&
+          var tagName = target.tagName.toUpperCase();
+          // Both `selected`, `disabled` and `checked` attributes are booleans.
+          if (tagName === "OPTION" &&
               spec.attr === "selected") {
             value = target.selected;
-          } else if (target.tagName.toUpperCase() === "INPUT" &&
+          } else if (tagName === "INPUT" &&
               spec.attr === "checked") {
             value = target.checked;
+          } else if (spec.attr === "disabled" &&
+              /^(INPUT|TEXTAREA|BUTTON|SELECT|OPTION|OPTGROUP|FIELDSET)$/.test(
+                tagName)) {
+            value = target.disabled;
           }
           // Treat class attribute (and aliases) specially.
           else if (spec.attr === "class" ||
