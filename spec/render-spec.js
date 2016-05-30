@@ -536,6 +536,39 @@ var fixtures = [
     exec:       render
   },
   {
+    name:       "renders disabled elements",
+    data:       {
+      "a": true,
+      "b": "disabled",
+      "c": false,
+      "d": "",
+      "e": "true",
+      "f": "false",
+      "g": "enabled"
+    },
+    directive:  {
+      'input@disabled': 'a',
+      'textarea@disabled': 'b',
+      'button@disabled': 'c',
+      'select@disabled': 'd',
+      'option@disabled': 'e',
+      'optgroup@disabled': 'f',
+      'fieldset@disabled': 'g'
+    },
+    fixture:    fromString('<div><fieldset><textarea></textarea><input/><button disabled></button><select disabled><optgroup disabled="disabled"><option></option></optgroup></select></fieldset></div>'),
+    expected:   fromString('<div><fieldset disabled="enabled"><textarea disabled="disabled"></textarea><input disabled="true"/><button></button><select><optgroup><option disabled="true"></option></optgroup></select></fieldset></div>'),
+    expectedData:{
+      "a": true,
+      "b": true,
+      "c": false,
+      "d": false,
+      "e": true,
+      "f": false,
+      "g": true
+    },
+    exec:       render
+  },
+  {
     name:       "renders a dropdown list",
     data:       {
       "sizes": [
