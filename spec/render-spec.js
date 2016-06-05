@@ -420,6 +420,30 @@ var fixtures = [
     }
   },
   {
+    name:       "renders class attribute with computed toggle helper and context",
+    data:       { list: {c: 'a', d: 'b'} },
+    directive:  {
+      ".toggle@class": Tectonic.toggleClass('found',
+        function(data, element) {
+          return this[data.list[element.textContent]];
+        },
+        function() {
+          return this;
+        }
+      )
+    },
+    fixture:    fromString('<a><b class="toggle found">c</b><b class="toggle found">d</b><b class="toggle">c</b><b class="toggle">d</b></a>'),
+    expected:   fromString('<a><b class="toggle found">c</b><b class="toggle">d</b><b class="toggle found">c</b><b class="toggle">d</b></a>'),
+    exec: function render(expected, element, data, directive, expect) {
+      var t = new Tectonic(element).context({ a: true, b: false });
+      expect(t.render(data, directive).get());
+      return t;
+    },
+    inverse:    function(_, element, directive) {
+      expect(element.parse(directive)).toEqual({ a: true, b: false });
+    }
+  },
+  {
     name:       "autorenders an input",
     data:       {
       "with-attr": "A",
