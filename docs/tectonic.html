@@ -3644,7 +3644,7 @@ also be specified.</p>
     }
     <span class="hljs-keyword">return</span> Tectonic.defineInverse(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toggleClass</span> (<span class="hljs-params"></span>) </span>{
       <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toggleClass</span> (<span class="hljs-params">data, element</span>) </span>{
-        <span class="hljs-keyword">var</span> value = format(data, element);
+        <span class="hljs-keyword">var</span> value = format.call(<span class="hljs-keyword">this</span>, data, element);
         <span class="hljs-keyword">var</span> selected = value === <span class="hljs-string">'false'</span> ? <span class="hljs-literal">false</span> : <span class="hljs-built_in">Boolean</span>(value);
         value = element.getAttribute(<span class="hljs-string">'class'</span>) || <span class="hljs-string">''</span>;
         <span class="hljs-keyword">var</span> classList = value.split(<span class="hljs-regexp">/\s+/</span>);
@@ -3662,7 +3662,7 @@ also be specified.</p>
     }, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">readClass</span> (<span class="hljs-params">data, value</span>) </span>{
       <span class="hljs-keyword">var</span> classList = value.split(<span class="hljs-regexp">/\s+/</span>);
       <span class="hljs-keyword">var</span> selected = classList.indexOf(className) &gt;= <span class="hljs-number">0</span>;
-      <span class="hljs-keyword">return</span> read(data, selected);
+      <span class="hljs-keyword">return</span> read.call(<span class="hljs-keyword">this</span>, data, selected);
     });
   };
 

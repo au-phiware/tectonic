@@ -1406,7 +1406,7 @@
     }
     return Tectonic.defineInverse(function toggleClass () {
       return function toggleClass (data, element) {
-        var value = format(data, element);
+        var value = format.call(this, data, element);
         var selected = value === 'false' ? false : Boolean(value);
         value = element.getAttribute('class') || '';
         var classList = value.split(/\s+/);
@@ -1424,7 +1424,7 @@
     }, function readClass (data, value) {
       var classList = value.split(/\s+/);
       var selected = classList.indexOf(className) >= 0;
-      return read(data, selected);
+      return read.call(this, data, selected);
     });
   };
 
