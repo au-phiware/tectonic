@@ -3,6 +3,7 @@ Tectonic.js
 
 [![Build Status](https://travis-ci.org/tecknack/tectonic.svg?branch=master)](https://travis-ci.org/tecknack/tectonic)
 [![NPM](https://img.shields.io/npm/v/tectonic.js.svg)](https://www.npmjs.com/package/tectonic.js)
+[![Coverage via Codecov](https://codecov.io/gh/tecknack/tectonic/branch/master/graph/badge.svg)](https://codecov.io/gh/tecknack/tectonic)
 
 Tectonic is a functional rendering engine for DOM nodes, heavily inspired by
 Beebole’s PURE rendering engine. It ascribes to PURE’s unobtusive philosophy,
