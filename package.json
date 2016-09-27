@@ -6,6 +6,7 @@
   "scripts": {
     "doc": "docco tectonic.js",
     "lint": "eslint tectonic.js",
+    "posttest": "codecov",
     "test": "eslint tectonic.js && echo 'Point your browser to http://localhost:9876/base/spec/index.html or http://localhost:9876/base/coverage/'; karma start"
   },
   "repository": {
@@ -27,6 +28,7 @@
   },
   "homepage": "http://tecknack.github.io/tectonic",
   "devDependencies": {
+    "codecov": "^1.0.1",
     "docco": "^0.7.0",
     "dom-compare": "^0.2.1",
     "eslint": "^2.11.0",
