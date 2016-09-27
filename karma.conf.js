@@ -55,6 +55,7 @@ module.exports = function(config) {
           type:'json',
           subdir: '.'
         }
+      ]
     },
 
     // web server port
